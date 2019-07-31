@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="550px"
+              android:layout_height="450px"
+              android:background="@drawable/activity_login_setup_bg"
+              android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="38px"
+        android:layout_marginTop="60px"
+        android:text="网络设置"
+        android:textColor="@color/setup_text"
+        android:textSize="28px"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="38px"
+        android:layout_marginTop="50px"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="160px"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:singleLine="true"
+            android:text="服务器地址："
+            android:textColor="@color/setup_text"
+            android:textSize="24px"/>
+
+        <EditText
+            android:id="@+id/et_activity_login_setup_host"
+            android:layout_width="276px"
+            android:layout_height="48px"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="30px"
+            android:background="@drawable/activity_login_setup_input"
+            android:maxLength="20"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textColor="@color/setup_text"
+            android:textSize="24px"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="38px"
+        android:layout_marginTop="30px"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="160px"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:singleLine="true"
+            android:text="服务器端口："
+            android:textColor="@color/setup_text"
+            android:textSize="24px"/>
+
+        <EditText
+            android:id="@+id/et_activity_login_setup_port"
+            android:layout_width="276px"
+            android:layout_height="48px"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="30px"
+            android:background="@drawable/activity_login_setup_input"
+            android:maxLength="20"
+            android:maxLines="1"
+            android:inputType="number"
+            android:singleLine="true"
+            android:textColor="@color/setup_text"
+            android:textSize="24px"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="38px"
+        android:layout_marginTop="30px"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="160px"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:text="组ID："
+            android:textColor="@color/setup_text"
+            android:textSize="24px"/>
+
+        <EditText
+            android:id="@+id/et_activity_login_setup_group"
+            android:layout_width="276px"
+            android:layout_height="48px"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="30px"
+            android:background="@drawable/activity_login_setup_input"
+            android:maxLength="20"
+            android:maxLines="1"
+            android:paddingLeft="15px"
+            android:paddingRight="15px"
+            android:singleLine="true"
+            android:textColor="@color/setup_text"
+            android:textSize="24px"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50px"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_activity_login_setup_qx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/activity_login_setup_btn_qx"
+            android:paddingBottom="8px"
+            android:paddingLeft="20px"
+            android:paddingRight="20px"
+            android:paddingTop="8px"
+            android:text="取消"
+            android:textColor="#515467"
+            android:textSize="24px"/>
+
+        <TextView
+            android:id="@+id/tv_activity_login_setup_qr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/activity_login_setup_btn_qr"
+            android:paddingBottom="8px"
+            android:paddingLeft="20px"
+            android:paddingRight="20px"
+            android:layout_marginLeft="80px"
+            android:paddingTop="8px"
+            android:text="确认"
+            android:textColor="@color/white"
+            android:textSize="24px"/>
+
+    </LinearLayout>
+
+</LinearLayout>

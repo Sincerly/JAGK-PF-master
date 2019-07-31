@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/ll_activity_main_left"
+            android:layout_width="88px"
+            android:layout_height="match_parent"
+            android:background="#1D2029"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10px"
+                android:src="@mipmap/activity_main_default_head"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_activity_main_left"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="85px"
+                android:clipToPadding="false"
+                android:paddingBottom="85px">
+            </android.support.v7.widget.RecyclerView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="80px"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="40px"
+                    android:text="BOM票箱空故障处理"
+                    android:textColor="#404040"
+                    android:textSize="30px"
+                    android:textStyle="bold"/>
+
+                <View
+                    android:layout_width="wrap_content"
+                    android:layout_height="1px"
+                    android:layout_weight="1"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="50px"
+                    android:drawableLeft="@mipmap/activity_main_topbar_one_unselect"
+                    android:drawablePadding="10px"
+                    android:gravity="center"
+                    android:text="总成绩单"
+                    android:textColor="@color/topbar_text"
+                    android:textSize="22px"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="50px"
+                    android:drawableLeft="@mipmap/activity_main_topbar_two_unselect"
+                    android:drawablePadding="10px"
+                    android:gravity="center"
+                    android:text="上传"
+                    android:textColor="@color/topbar_text"
+                    android:textSize="22px"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="50px"
+                    android:drawableLeft="@mipmap/activity_main_topbar_three_unselect"
+                    android:drawablePadding="10px"
+                    android:gravity="center"
+                    android:text="标记"
+                    android:textColor="@color/topbar_text"
+                    android:textSize="22px"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="50px"
+                    android:drawableLeft="@mipmap/activity_main_topbar_four_unselect"
+                    android:drawablePadding="10px"
+                    android:gravity="center"
+                    android:text="定位标记"
+                    android:textColor="@color/topbar_text"
+                    android:textSize="22px"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="50px"
+                    android:drawableLeft="@mipmap/activity_main_topbar_five_unselect"
+                    android:drawablePadding="10px"
+                    android:gravity="center"
+                    android:text="定位不同"
+                    android:textColor="@color/topbar_text"
+                    android:textSize="22px"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="#B5B5B5"
+                />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="20px"
+                android:paddingTop="20px">
+
+                <AbsoluteLayout
+                    android:id="@+id/base_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/activity_main_right_bg">
+
+                </AbsoluteLayout>
+            </ScrollView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#1d2029</color>
+    <color name="colorPrimaryDark">#1d2029</color>
+    <color name="colorAccent">#FF6C00</color>
+
+    <color name="white">#FFFFFF</color>
+
+    <color name="setup_text">#303030</color>
+    <color name="title_bg">#434343</color>
+    <color name="topbar_text">#4D515C</color>
+    <color name="line_color">#626262</color>
+    <color name="tips">#8C8C8C</color>
+    <color name="item_unenable">#CCCCCC</color>
+
+    <color name="main_left_black">#1D2029</color>
+
+    <color name="arc_bg">#f0f0f0</color>
+    <color name="excel_bg">#bfbfbf</color>
+    <color name="column_bg">#099bfb</color>
+
+
+    <color name="arc_temp">#333333</color>
+    <color name="arc21">#fc843b</color>
+    <color name="arc23">#079df9</color>
+    <color name="arc_text">#999999</color>
+
+</resources>
