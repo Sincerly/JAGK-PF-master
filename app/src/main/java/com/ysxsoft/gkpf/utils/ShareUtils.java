@@ -14,6 +14,7 @@ public class ShareUtils {
     private static String USER_TYPE_KEY = "USER_TYPE_KEY";
     private static String USER_NAME_KEY = "USER_NAME_KEY";
     private static String USER_PWD_KEY= "USER_PWD_KEY";
+    private static String INSTRUCTION_KEY= "INSTRUCTION_KEY";
 
     public static void setHost(String host) {
         setValue(HOST_KEY, host);
@@ -62,6 +63,14 @@ public class ShareUtils {
 
     public static String getUserPwd() {
         return getValue(USER_PWD_KEY);
+    }
+
+    public static void setInstruction(String instruction) {
+        setValue(INSTRUCTION_KEY, instruction);
+    }
+
+    public static String getInstruction() {
+        return getValue(INSTRUCTION_KEY);
     }
 
 

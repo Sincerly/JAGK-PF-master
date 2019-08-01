@@ -11,7 +11,7 @@ public class FileResponse {
 
     private String fileContents;
     private String fileName;
-    private int fileSize;
+    private long fileSize;
     private int groupId;
     private int requestId;
 
@@ -31,11 +31,11 @@ public class FileResponse {
         this.fileName = fileName;
     }
 
-    public int getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(int fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
 

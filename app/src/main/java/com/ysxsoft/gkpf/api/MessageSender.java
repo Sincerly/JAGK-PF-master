@@ -31,6 +31,7 @@ import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_ASK_NOTIFY;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_CACHE_REPLY;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_DIFFJUDGMENTS_REPLY;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_EXAMEND_NOTIFY;
+import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_EXAMSTART_NOTIFY;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_FILESEND;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_FILESEND_ACK;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_INSTRUCTION_NOTIFY;
@@ -244,6 +245,11 @@ public class MessageSender {
                                     Log.e("tag", "登出回复" + s);
                                     MessageCallbackMap.notifyPage("Main", packet, s, body);
                                     break;
+                                case MSG_MANUALSCORE_EXAMSTART_NOTIFY:
+                                    //考试开始通知
+                                    Log.e("tag", "考试开始通知" + s);
+                                    MessageCallbackMap.notifyPage("Main", packet, s, body);
+                                    break;
                                 case MSG_MANUALSCORE_CACHE_REPLY:
                                     //缓存反馈
                                     Log.e("tag", "缓存反馈" + s);
@@ -342,8 +348,10 @@ public class MessageSender {
      */
     public static void close() {
         isExit = true;
-        manager.disconnect();
-        manager=null;
+        if(manager!=null){
+            manager.disconnect();
+            manager=null;
+        }
     }
 
     public static class ReconnectionManager extends AbsReconnectionManager {
