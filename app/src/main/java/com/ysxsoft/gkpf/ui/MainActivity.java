@@ -3,11 +3,13 @@ package com.ysxsoft.gkpf.ui;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.constraint.solver.Cache;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AbsoluteLayout;
+import android.widget.TextView;
 
 import com.chong.widget.verticalviewpager.DummyViewPager;
 import com.google.gson.Gson;
@@ -17,6 +19,9 @@ import com.ysxsoft.gkpf.R;
 import com.ysxsoft.gkpf.api.ApiManager;
 import com.ysxsoft.gkpf.api.IMessageCallback;
 import com.ysxsoft.gkpf.api.MessageCallbackMap;
+import com.ysxsoft.gkpf.api.MessageSender;
+import com.ysxsoft.gkpf.bean.request.UploadScoreRequest;
+import com.ysxsoft.gkpf.bean.response.CacheResponse;
 import com.ysxsoft.gkpf.bean.response.FileResponse;
 import com.ysxsoft.gkpf.bean.response.LogoutResponse;
 import com.ysxsoft.gkpf.bean.response.TaskListResponse;
@@ -25,6 +30,7 @@ import com.ysxsoft.gkpf.ui.adapter.ContentFragmentAdapter;
 import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
 import com.ysxsoft.gkpf.utils.FileUtils;
 import com.ysxsoft.gkpf.utils.JsonUtils;
+import com.ysxsoft.gkpf.utils.ShareUtils;
 import com.ysxsoft.gkpf.utils.ToastUtils;
 import com.ysxsoft.gkpf.view.MainLeftPopupView;
 
@@ -33,7 +39,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.LinkedHashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,9 +68,14 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     RecyclerView rvActivityMainLeft;
     @BindView(R.id.vertical_viewpager)
     DummyViewPager verticalViewpager;
+    @BindView(R.id.upload)
+    TextView upload;
 
     private LeftAdapter leftAdapter;
     List<TaskListResponse> taskList;
+    //List<CacheResponse.DataBean> cacheResponses;
+    Map<String,List<CacheResponse>> cacheResponses;
+    private String missionId="";//TODO:考试ID
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +90,14 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         //ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
         initList("");
+        initCache("");
     }
 
+    /**
+     * 任务状态变化通知  处理服务器返回值
+     * @param json
+     * @return
+     */
     private String initList(String json) {
         String missionId = "";//missionId
         if (taskList == null) {
@@ -117,6 +139,80 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         return missionId;
     }
 
+    /**
+     * 请求缓存 处理服务器返回值
+     */
+    private void initCache(String json){
+        if (cacheResponses == null) {
+            cacheResponses = new HashMap<>();
+        }else{
+            cacheResponses.clear();
+        }
+        json="{\"groupId\":\"1\",\"requestId\":1,\"flowName1\":[{\"score\":1.5,\"isConfirmed\":false},{ \"score\":5,\"isConfirmed\":false}],\"flowName2\":[{\"score\":5,\"isConfirmed\":true},{\"score\":5, \"isConfirmed\":false}]}";
+        try {
+            JSONObject jsonObject=new JSONObject(json);
+            Iterator<String> keys=jsonObject.keys();
+            while (keys.hasNext()){
+                String key=keys.next();
+                if ("groupId".equals(key)){
+                    String groupId=jsonObject.getString("groupId");
+                }else if ("requestId".equals(key)){
+                    int requestId=jsonObject.getInt("requestId");
+                }else {
+                    JSONArray array=jsonObject.getJSONArray(key);
+                    List<CacheResponse> list=new ArrayList<>();
+                    for (int i = 0; i <array.length() ; i++) {
+                        JSONObject object=array.getJSONObject(i);
+                        Object score=object.get("score");
+                        boolean isConfirmed=(boolean)object.get("isConfirmed");
+                        //返回值封装数据
+                        CacheResponse response=new CacheResponse();
+                        response.setScore(score);
+                        response.setConfirmed(isConfirmed);
+                        list.add(response);
+                    }
+                    cacheResponses.put(key,list);//放进map
+                }
+            }
+            Log.e("tag","cacheList:"+new Gson().toJson(cacheResponses));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 上传分数
+     */
+    private void upload(){
+        UploadScoreRequest request=new UploadScoreRequest();
+        request.setMissionId(missionId);
+        request.setGroupId(ShareUtils.getGroup());
+        request.setUserName(ShareUtils.getUserName());
+        Map<String,List<LinkedHashMap<String,Object>>> stepMap=new HashMap<>();
+
+        Set<String> set=cacheResponses.keySet();
+        Iterator<String> keys=set.iterator();
+        //放文件
+        while (keys.hasNext()){
+            String key=keys.next();
+            List<LinkedHashMap<String,Object>> flowName1=new ArrayList<>();
+            List<CacheResponse> item=cacheResponses.get(key);
+            if(item!=null){
+                for (int i = 0; i <item.size() ; i++) {
+                    CacheResponse cacheResponse=item.get(i);
+                    LinkedHashMap<String,Object> objectMap=new LinkedHashMap<>();
+                    objectMap.put("score",cacheResponse.getScore());
+                    objectMap.put("isConfirmed",cacheResponse.isConfirmed());
+                    flowName1.add(objectMap);
+                }
+            }
+            stepMap.put(key,flowName1);
+        }
+        request.setStepScores(stepMap);
+        System.out.println("data:"+new Gson().toJson(request));
+        ApiManager.uploadScore(request);
+    }
+
     private void initView() {
         //左侧导航
         rvActivityMainLeft.setLayoutManager(new LinearLayoutManager(this));
@@ -151,7 +247,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         verticalViewpager.setOffscreenPageLimit(5);
     }
 
-    @OnClick(R.id.ll_activity_main_left)
+    @OnClick({R.id.ll_activity_main_left,R.id.upload})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ll_activity_main_left:
@@ -159,6 +255,10 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                         .popupPosition(PopupPosition.Left)//右边
                         .asCustom(new MainLeftPopupView(this))
                         .show();
+                break;
+            case R.id.upload:
+                //上传接口
+                upload();
                 break;
         }
     }
@@ -194,6 +294,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             case MSG_MANUALSCORE_CACHE_REPLY:
                 //缓存反馈
                 Log.e("tag", "缓存反馈");
+                initCache(json);
                 break;
             case MSG_MANUALSCORE_FILESEND:
                 //评分表文件发送

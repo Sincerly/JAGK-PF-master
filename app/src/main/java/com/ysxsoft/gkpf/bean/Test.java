@@ -4,7 +4,10 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.ysxsoft.gkpf.bean.request.UploadScoreRequest;
+import com.ysxsoft.gkpf.bean.response.CacheResponse;
 import com.ysxsoft.gkpf.bean.response.TaskListResponse;
+import com.ysxsoft.gkpf.utils.ShareUtils;
 
 
 import org.json.JSONArray;
@@ -13,43 +16,41 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class Test {
     public static void main(String[] args) {
-        List<TaskListResponse> taskList=new ArrayList<>();
-        String json="{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"flowName1\",\"flowName2\"]},{\"taskName\":\"taskName2\",\"taskState\":1,\"flowNameList\":[\"flowName3\",\"flowName4\"]}]}";
+        List<CacheResponse.DataBean> cacheResponses=new ArrayList<>();
+        String cache="{\"groupId\":\"1\",\"requestId\":1,\"flowName1\":[{\"score\":1.5,\"isConfirmed\":false},{ \"score\":5,\"isConfirmed\":false}],\"flowName2\":[{\"score\":5,\"isConfirmed\":true},{\"score\":5, \"isConfirmed\":false}]}";
         try {
-            JSONObject jsonObject=new JSONObject(json);
-            String groupId=jsonObject.optString("groupId");
-            int requestId=jsonObject.optInt("requestId");
-            String missionId=jsonObject.optString("missionId");
+            JSONObject jsonObject=new JSONObject(cache);
+            Iterator<String> keys=jsonObject.keys();
+            while (keys.hasNext()){
+                String key=keys.next();
+                if ("groupId".equals(key)){
+                    String groupId=jsonObject.getString("groupId");
+                }else if ("requestId".equals(key)){
+                    int requestId=jsonObject.getInt("requestId");
+                }else {
+                    JSONArray array=jsonObject.getJSONArray(key);
+                    for (int i = 0; i <array.length() ; i++) {
+                        JSONObject object=array.getJSONObject(i);
+                        Object score=object.get("score");
+                        boolean isConfirmed=(boolean)object.get("isConfirmed");
 
-            JSONArray array=jsonObject.optJSONArray("taskInfoList");
-            for (int i = 0; i <array.length() ; i++) {
-                JSONObject item=array.getJSONObject(i);
-                String taskName=item.optString("taskName");
-                int taskState=item.optInt("taskState");
-
-                JSONArray flowNameList=item.optJSONArray("flowNameList");
-                List<String> flowNames=new ArrayList<>();
-                for (int j = 0; j <flowNameList.length(); j++) {
-                    String flowName= (String) flowNameList.get(i);
-                    flowNames.add(flowName);
-                    TaskListResponse response=new TaskListResponse();
-                    response.setMissionId(missionId);
-                    response.setGroupId(groupId);
-                    response.setTaskState(taskState);
-                    response.setTaskName(taskName);
-
-                    taskList.add(response);
+                        CacheResponse.DataBean response=new CacheResponse.DataBean();
+                        response.setConfirmed(isConfirmed);//是否确认
+                        response.setFlowName(key);//文件名
+                        response.setScore(score);//分数
+                        cacheResponses.add(response);
+                    }
                 }
             }
-            System.out.println(new Gson().toJson(taskList));
-        }catch(JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
+
 }
