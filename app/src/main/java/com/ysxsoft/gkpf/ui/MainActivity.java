@@ -22,6 +22,7 @@ import com.ysxsoft.gkpf.api.IMessageCallback;
 import com.ysxsoft.gkpf.api.MessageCallbackMap;
 import com.ysxsoft.gkpf.api.MessageSender;
 import com.ysxsoft.gkpf.bean.request.UploadScoreRequest;
+import com.ysxsoft.gkpf.bean.response.AskResponse;
 import com.ysxsoft.gkpf.bean.response.CacheResponse;
 import com.ysxsoft.gkpf.bean.response.FileResponse;
 import com.ysxsoft.gkpf.bean.response.LogoutResponse;
@@ -177,15 +178,15 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                         Object score = object.get("score");
                         boolean isConfirmed = (boolean) object.get("isConfirmed");
                         //返回值封装数据
-                        CacheResponse response=new CacheResponse();
+                        CacheResponse response = new CacheResponse();
                         response.setScore(score);
                         response.setConfirmed(isConfirmed);
                         list.add(response);
                     }
-                    cacheResponses.put(key,list);//放进map
+                    cacheResponses.put(key, list);//放进map
                 }
             }
-            Log.e("tag","cacheList:"+new Gson().toJson(cacheResponses));
+            Log.e("tag", "cacheList:" + new Gson().toJson(cacheResponses));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -194,12 +195,12 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     /**
      * 上传分数
      */
-    private void upload(){
-        UploadScoreRequest request=new UploadScoreRequest();
+    private void upload() {
+        UploadScoreRequest request = new UploadScoreRequest();
         request.setMissionId(missionId);
         request.setGroupId(ShareUtils.getGroup());
         request.setUserName(ShareUtils.getUserName());
-        Map<String,List<LinkedHashMap<String,Object>>> stepMap=new HashMap<>();
+        Map<String, List<LinkedHashMap<String, Object>>> stepMap = new HashMap<>();
 
         Set<String> set = cacheResponses.keySet();
         Iterator<String> keys = set.iterator();
@@ -217,10 +218,10 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                     flowName1.add(objectMap);
                 }
             }
-            stepMap.put(key,flowName1);
+            stepMap.put(key, flowName1);
         }
         request.setStepScores(stepMap);
-        System.out.println("data:"+new Gson().toJson(request));
+        System.out.println("data:" + new Gson().toJson(request));
         ApiManager.uploadScore(request);
     }
 
@@ -253,6 +254,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         try {
             JSONObject jsonObject = new JSONObject(json);
             Iterator<String> keys = jsonObject.keys();
+            List<String> list = new ArrayList<>();
             while (keys.hasNext()) {
                 String key = keys.next();
                 if ("groupId".equals(key)) {
@@ -261,17 +263,18 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                     int requestId = jsonObject.optInt("requestId");
                 } else {
                     LinkedHashMap<String, String> map = new LinkedHashMap();
-
-                    JSONObject flowObject = new JSONObject(json);
+                    JSONObject flowObject = jsonObject.getJSONObject(key);
                     Iterator<String> flowKeyList = flowObject.keys();
                     while (flowKeyList.hasNext()) {
                         String flowKey = flowKeyList.next();
                         String placeHolderStr = flowObject.optString(flowKey);
                         map.put(flowKey, placeHolderStr);//替换内容
                     }
-                    replaceMap.put(key, map);//放进map
+                    list.add(key);//放进key
+                    replaceMap.put(key, map);
                 }
             }
+            ApiManager.confirmReplace(list);
             Log.e("tag", "replaceList:" + new Gson().toJson(replaceMap));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -329,13 +332,13 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         }
     }
 
-    @OnClick({R.id.ll_activity_main_left,R.id.upload})
+    @OnClick({R.id.ll_activity_main_left, R.id.upload})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ll_activity_main_left:
                 new XPopup.Builder(this)
                         .popupPosition(PopupPosition.Left)//右边
-                        .asCustom(new MainLeftPopupView(this, taskList,leftPopupAdapter))
+                        .asCustom(new MainLeftPopupView(this, taskList, leftPopupAdapter))
                         .show();
                 break;
             case R.id.upload:
@@ -407,9 +410,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             case MSG_MANUALSCORE_REPLACE_NOTIFY:
                 //占位符替换数据通知
                 Log.e("tag", "占位符替换数据通知");
-                //{"flowName1":{"replaceholder1":"","replaceholder2":"","replaceholder3":""},"flowName2":{"replaceholder1":"","replaceholder2":"","replaceholder3":""},"groupId":1,"requestId":1}
-                //flowName1动态key
-//               ApiManager.confirmReplace("");
+                initReplaceNotify(json);
                 break;
             case MSG_MANUALSCORE_TASKLISTSTATE_NOTIFY:
                 //任务状态变化通知
@@ -422,7 +423,11 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             case MSG_MANUALSCORE_ASK_NOTIFY:
                 //问询通知
                 Log.e("tag", "问询通知");
-//              ApiManager.confirmAsk();
+                AskResponse uploadResponse = JsonUtils.parseByGson(json, AskResponse.class);
+                if(uploadResponse!=null){
+                    String flowName = uploadResponse.getFlowName();
+                    ApiManager.confirmAsk(flowName);
+                }
                 break;
             case MSG_MANUALSCORE_UPLOADSCORE_REPLY:
                 //评分上传反馈
