@@ -564,4 +564,9 @@ public class ContentFragment extends Fragment {
 //            showToast(myCell.getValue().toString());
         }
     }
+
+    public void refreshMain(int p, Object object, boolean isConfirm){
+        MainActivity activity= (MainActivity) getActivity();
+        activity.uploadByPosition(getFileName(),p,object,isConfirm);
+    }
 }

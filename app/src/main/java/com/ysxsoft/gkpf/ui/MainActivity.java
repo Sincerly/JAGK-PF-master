@@ -76,8 +76,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     private LeftItemClickListener leftItemClick;
     List<TaskListResponse> taskList;
     //List<CacheResponse.DataBean> cacheResponses;
-    Map<String,List<CacheResponse>> cacheResponses;
-    private String missionId="";//TODO:考试ID
+    Map<String, List<CacheResponse>> cacheResponses;
+    private String missionId = "";//TODO:考试ID
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +85,11 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         initView();
-        initLeftData();
-        initViewPager();
+//        initLeftData();
+//        initViewPager();
 
         MessageCallbackMap.reg("Main", this);
-        //ApiManager.logout();//退出登录
+        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
         initList("");
         initCache("");
@@ -97,6 +97,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
 
     /**
      * 任务状态变化通知  处理服务器返回值
+     *
      * @param json
      * @return
      */
@@ -147,39 +148,39 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     /**
      * 请求缓存 处理服务器返回值
      */
-    private void initCache(String json){
+    private void initCache(String json) {
         if (cacheResponses == null) {
             cacheResponses = new HashMap<>();
-        }else{
+        } else {
             cacheResponses.clear();
         }
-        json="{\"groupId\":\"1\",\"requestId\":1,\"flowName1\":[{\"score\":1.5,\"isConfirmed\":false},{ \"score\":5,\"isConfirmed\":false}],\"flowName2\":[{\"score\":5,\"isConfirmed\":true},{\"score\":5, \"isConfirmed\":false}]}";
+        json = "{\"groupId\":\"1\",\"requestId\":1,\"flowName1\":[{\"score\":1.5,\"isConfirmed\":false},{ \"score\":5,\"isConfirmed\":false}],\"flowName2\":[{\"score\":5,\"isConfirmed\":true},{\"score\":5, \"isConfirmed\":false}]}";
         try {
-            JSONObject jsonObject=new JSONObject(json);
-            Iterator<String> keys=jsonObject.keys();
-            while (keys.hasNext()){
-                String key=keys.next();
-                if ("groupId".equals(key)){
-                    String groupId=jsonObject.getString("groupId");
-                }else if ("requestId".equals(key)){
-                    int requestId=jsonObject.getInt("requestId");
-                }else {
-                    JSONArray array=jsonObject.getJSONArray(key);
-                    List<CacheResponse> list=new ArrayList<>();
-                    for (int i = 0; i <array.length() ; i++) {
-                        JSONObject object=array.getJSONObject(i);
-                        Object score=object.get("score");
-                        boolean isConfirmed=(boolean)object.get("isConfirmed");
+            JSONObject jsonObject = new JSONObject(json);
+            Iterator<String> keys = jsonObject.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                if ("groupId".equals(key)) {
+                    String groupId = jsonObject.getString("groupId");
+                } else if ("requestId".equals(key)) {
+                    int requestId = jsonObject.getInt("requestId");
+                } else {
+                    JSONArray array = jsonObject.getJSONArray(key);
+                    List<CacheResponse> list = new ArrayList<>();
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject object = array.getJSONObject(i);
+                        Object score = object.get("score");
+                        boolean isConfirmed = (boolean) object.get("isConfirmed");
                         //返回值封装数据
-                        CacheResponse response=new CacheResponse();
+                        CacheResponse response = new CacheResponse();
                         response.setScore(score);
                         response.setConfirmed(isConfirmed);
                         list.add(response);
                     }
-                    cacheResponses.put(key,list);//放进map
+                    cacheResponses.put(key, list);//放进map
                 }
             }
-            Log.e("tag","cacheList:"+new Gson().toJson(cacheResponses));
+            Log.e("tag", "cacheList:" + new Gson().toJson(cacheResponses));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -188,34 +189,50 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     /**
      * 上传分数
      */
-    private void upload(){
-        UploadScoreRequest request=new UploadScoreRequest();
+    private void upload() {
+        UploadScoreRequest request = new UploadScoreRequest();
         request.setMissionId(missionId);
         request.setGroupId(ShareUtils.getGroup());
         request.setUserName(ShareUtils.getUserName());
-        Map<String,List<LinkedHashMap<String,Object>>> stepMap=new HashMap<>();
+        Map<String, List<LinkedHashMap<String, Object>>> stepMap = new HashMap<>();
 
-        Set<String> set=cacheResponses.keySet();
-        Iterator<String> keys=set.iterator();
+        Set<String> set = cacheResponses.keySet();
+        Iterator<String> keys = set.iterator();
         //放文件
-        while (keys.hasNext()){
-            String key=keys.next();
-            List<LinkedHashMap<String,Object>> flowName1=new ArrayList<>();
-            List<CacheResponse> item=cacheResponses.get(key);
-            if(item!=null){
-                for (int i = 0; i <item.size() ; i++) {
-                    CacheResponse cacheResponse=item.get(i);
-                    LinkedHashMap<String,Object> objectMap=new LinkedHashMap<>();
-                    objectMap.put("score",cacheResponse.getScore());
-                    objectMap.put("isConfirmed",cacheResponse.isConfirmed());
+        while (keys.hasNext()) {
+            String key = keys.next();
+            List<LinkedHashMap<String, Object>> flowName1 = new ArrayList<>();
+            List<CacheResponse> item = cacheResponses.get(key);
+            if (item != null) {
+                for (int i = 0; i < item.size(); i++) {
+                    CacheResponse cacheResponse = item.get(i);
+                    LinkedHashMap<String, Object> objectMap = new LinkedHashMap<>();
+                    objectMap.put("score", cacheResponse.getScore());
+                    objectMap.put("isConfirmed", cacheResponse.isConfirmed());
                     flowName1.add(objectMap);
                 }
             }
-            stepMap.put(key,flowName1);
+            stepMap.put(key, flowName1);
         }
         request.setStepScores(stepMap);
-        System.out.println("data:"+new Gson().toJson(request));
+        System.out.println("data:" + new Gson().toJson(request));
         ApiManager.uploadScore(request);
+    }
+
+    /**
+     * fragment单项上传
+     */
+    public void uploadByPosition(String fileName, int p, Object object, boolean isConfirm) {
+        if (cacheResponses != null) {
+            List<CacheResponse> list=cacheResponses.get(fileName);
+            for (int i = 0; i <list.size(); i++) {
+                if(i==p){
+                    list.get(i).setConfirmed(isConfirm);
+                    list.get(i).setScore(object);
+                }
+            }
+            upload();
+        }
     }
 
     private void initView() {
@@ -241,7 +258,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         verticalViewpager.setAdapter(holder.set());
         //If you setting other scroll mode, the scrolled fade is shown from either side of display.
         verticalViewpager.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
-        verticalViewpager.setOffscreenPageLimit(5);
+        verticalViewpager.setOffscreenPageLimit(taskList.size());
         verticalViewpager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
@@ -268,13 +285,13 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         }
     }
 
-    @OnClick({R.id.ll_activity_main_left,R.id.upload})
+    @OnClick({R.id.ll_activity_main_left, R.id.upload})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ll_activity_main_left:
                 new XPopup.Builder(this)
                         .popupPosition(PopupPosition.Left)//右边
-                        .asCustom(new MainLeftPopupView(this, taskList,leftItemClick))
+                        .asCustom(new MainLeftPopupView(this, taskList, leftItemClick))
                         .show();
                 break;
             case R.id.upload:
@@ -304,6 +321,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
+                            MessageSender.close();
                             ToastUtils.showToast(MainActivity.this, "登出成功！", 300);
                             finish();
                         }
