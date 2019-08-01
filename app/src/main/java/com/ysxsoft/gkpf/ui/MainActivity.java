@@ -92,6 +92,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         initView();
 
         MessageCallbackMap.reg("Main", this);
+//        ApiManager.logout();//退出登录
         //ApiManager.logout();//退出登录
 //        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
