@@ -38,6 +38,7 @@ public class ContentFragment extends Fragment {
 
     RecyclerView baseRecycler;
     AbsoluteLayout baseView;
+    TextView baseTips;
 
     private MyCell xuHaoView = null;      //序号行位置
     private MyCell huiZongView = null;    //汇总行位置
@@ -85,6 +86,7 @@ public class ContentFragment extends Fragment {
         baseRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         LeftAdapter leftAdapter = new LeftAdapter(R.layout.activity_main_left_item);
         View headView = View.inflate(getActivity(), R.layout.fragment_content_head, null);
+        baseTips = headView.findViewById(R.id.tv_tips);
         baseView = headView.findViewById(R.id.base_view);
         leftAdapter.addHeaderView(headView);
         baseRecycler.setAdapter(leftAdapter);
@@ -361,8 +363,8 @@ public class ContentFragment extends Fragment {
         Iterator<Map.Entry<String, TextView>> iterator = noPfViews.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, TextView> entry = iterator.next();
-            MyCell noPFCell=(MyCell) noPfViews.get(entry.getKey()).getTag();
-            if(myCell.getRow()>noPFCell.getRow()){
+            MyCell noPFCell = (MyCell) noPfViews.get(entry.getKey()).getTag();
+            if (myCell.getRow() > noPFCell.getRow()) {
 
             }
         }
@@ -582,5 +584,15 @@ public class ContentFragment extends Fragment {
     public void refreshMain(int p, Object object, boolean isConfirm) {
         MainActivity activity = (MainActivity) getActivity();
         activity.uploadByPosition(getFileName(), p, object, isConfirm);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getPosition() == 0) {
+            baseTips.setText("");
+            baseTips.setVisibility(View.VISIBLE);
+        }
+
     }
 }

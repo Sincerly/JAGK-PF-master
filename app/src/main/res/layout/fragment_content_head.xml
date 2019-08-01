@@ -4,6 +4,18 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/tv_tips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20px"
+        android:layout_marginTop="20px"
+        android:lineSpacingExtra="10px"
+        android:textColor="#8C8C8C"
+        android:textSize="22px"
+        android:visibility="gone"
+        />
+
     <AbsoluteLayout
         android:id="@+id/base_view"
         android:layout_width="wrap_content"
