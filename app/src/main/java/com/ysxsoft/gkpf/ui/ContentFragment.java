@@ -23,6 +23,7 @@ import com.ysxsoft.gkpf.bean.MyCell;
 import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
 import com.ysxsoft.gkpf.utils.JxlExcelReadUtils;
 import com.ysxsoft.gkpf.utils.PoiExcelReadUtils;
+import com.ysxsoft.gkpf.utils.ShareUtils;
 import com.ysxsoft.gkpf.utils.SystemUtils;
 import com.ysxsoft.gkpf.view.MainLeftPopupView;
 import com.ysxsoft.gkpf.view.PingFenPopupView;
@@ -589,10 +590,9 @@ public class ContentFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (getPosition() == 0) {
-            baseTips.setText("");
+        if (getPosition() == 0&& (!TextUtils.isEmpty(ShareUtils.getInstruction()))) {
+            baseTips.setText(ShareUtils.getInstruction());
             baseTips.setVisibility(View.VISIBLE);
         }
-
     }
 }
