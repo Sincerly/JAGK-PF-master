@@ -64,6 +64,7 @@ public class MessageSender {
     public static IConnectionManager manager;
     public static ConnectionInfo info;
     public static SocketActionAdapter adapter;
+    public static boolean isExit = false;
 
     /**
      * 创建消息
@@ -140,7 +141,7 @@ public class MessageSender {
 
             @Override
             public int getBodyLength(byte[] header, ByteOrder byteOrder) {
-                Log.e("tag", "getBodyLength headerLength:"+new Gson().toJson(header));
+                Log.e("tag", "getBodyLength headerLength:" + new Gson().toJson(header));
                 int bodyLength = 8;
                 byte[] b = new byte[4];
                 for (int i = 4; i < 8; i++) {
@@ -203,104 +204,104 @@ public class MessageSender {
             public void onSocketReadResponse(ConnectionInfo info, String action, OriginalData data) {
                 super.onSocketReadResponse(info, action, data);
                 handler.removeCallbacksAndMessages(null);//清空handler
-                    handler.sendEmptyMessageDelayed(0x01, 5000);//5s后重连
-                    //Socket从服务器读取到字节回调
-                    int length = data.getBodyBytes().length;
-                    if (length > 0) {
-                        byte[] bytes = data.getBodyBytes();//带终止码和校验码的
-                        byte[] body = new byte[bytes.length - 2];
+                handler.sendEmptyMessageDelayed(0x01, 5000);//5s后重连
+                //Socket从服务器读取到字节回调
+                int length = data.getBodyBytes().length;
+                if (length > 0) {
+                    byte[] bytes = data.getBodyBytes();//带终止码和校验码的
+                    byte[] body = new byte[bytes.length - 2];
 
-                        byte end = bytes[bytes.length - 1];//终止码
-                        if (0X0A == end) {
-                            //数据校验
-                            byte[] header = new byte[7];
-                            System.arraycopy(data.getHeadBytes(), 1, header, 0, data.getHeadBytes().length - 1);//Header 去掉0X03起始码  参与校验用
-                            System.arraycopy(bytes, 0, body, 0, bytes.length - 2);//数据内容
+                    byte end = bytes[bytes.length - 1];//终止码
+                    if (0X0A == end) {
+                        //数据校验
+                        byte[] header = new byte[7];
+                        System.arraycopy(data.getHeadBytes(), 1, header, 0, data.getHeadBytes().length - 1);//Header 去掉0X03起始码  参与校验用
+                        System.arraycopy(bytes, 0, body, 0, bytes.length - 2);//数据内容
 
-                            byte[] checkBytes = new byte[header.length + body.length];
-                            System.arraycopy(header, 0, checkBytes, 0, header.length);//Header 去掉0X03起始码  参与校验用
-                            System.arraycopy(body, 0, checkBytes, header.length, body.length);//数据内容
+                        byte[] checkBytes = new byte[header.length + body.length];
+                        System.arraycopy(header, 0, checkBytes, 0, header.length);//Header 去掉0X03起始码  参与校验用
+                        System.arraycopy(body, 0, checkBytes, header.length, body.length);//数据内容
 
-                            byte parseSum = checkSum(checkBytes, 0, checkBytes.length);
-                            byte sum = bytes[bytes.length - 2];//校验码
-                            //校验码比对
-                            if (parseSum == sum) {
-                                short packet = getPacketType(data.getHeadBytes());//获取报文类型
-                                String s = null;
-                                try {
-                                    s = new String(body, "UTF-8");
-                                } catch (UnsupportedEncodingException e) {
-                                    e.printStackTrace();
-                                }
-                                switch (packet) {
-                                    case ApiManager.MSG_MANUALSCORE_LOGIN_REPLY:
-                                        //登录反馈
-                                        Log.e("tag", "登录回复" + s);
-                                        MessageCallbackMap.notifyPage("Login", packet, s, body);
-                                        break;
-                                    case MSG_MANUALSCORE_LOGINOUT_REPLY:
-                                        //登出反馈
-                                        Log.e("tag", "登出回复" + s);
-                                        MessageCallbackMap.notifyPage("Main", packet, s, body);
-                                        break;
-                                    case MSG_MANUALSCORE_CACHE_REPLY:
-                                        //缓存反馈
-                                        Log.e("tag", "缓存反馈" + s);
-                                        MessageCallbackMap.notifyPage("Main", packet, s, body);
-                                        break;
-                                    case MSG_MANUALSCORE_FILESEND:
-                                        //评分表文件发送
-                                        Log.e("tag", "评分表文件发送" + s);
-                                        MessageCallbackMap.notifyPage("Main", packet, s, body);
-                                        break;
-                                    case MSG_MANUALSCORE_REPLACE_NOTIFY:
-                                        //占位符替换数据通知
-                                        Log.e("tag", "占位符替换数据通知" + s);
-                                        MessageCallbackMap.notifyPage("Main", packet, s, body);
-                                        break;
-                                    case MSG_MANUALSCORE_TASKLISTSTATE_NOTIFY:
-                                        //任务状态变化通知
-                                        Log.e("tag", "任务状态变化通知" + s);
-                                        MessageCallbackMap.notifyPage("Main", packet, s, body);
-                                        break;
-                                    case MSG_MANUALSCORE_ASK_NOTIFY:
-                                        //问询通知
-                                        Log.e("tag", "问询通知" + s);
-                                        MessageCallbackMap.notifyPage("Main", packet, s, body);
-                                        break;
-                                    case MSG_MANUALSCORE_UPLOADSCORE_REPLY:
-                                        //评分上传反馈
-                                        Log.e("tag", "评分上传反馈" + s);
-                                        MessageCallbackMap.notifyPage("Main", packet, s, body);
-                                        break;
-                                    case MSG_MANUALSCORE_EXAMEND_NOTIFY:
-                                        //考试结束通知
-                                        Log.e("tag", "考试结束通知" + s);
-                                        MessageCallbackMap.notifyPage("Main", packet, s, body);
-                                        break;
-                                    case MSG_MANUALSCORE_DIFFJUDGMENTS_REPLY:
-                                        //定位不同反馈
-                                        Log.e("tag", "定位不同反馈" + s);
-                                        MessageCallbackMap.notifyPage("Main", packet, s, body);
-                                        break;
-                                    case MSG_TOTALGRADEFORM_REPLY:
-                                        //总成绩单反馈
-                                        Log.e("tag", "总成绩单反馈" + s);
-                                        MessageCallbackMap.notifyPage("Main", packet, s, body);
-                                        break;
-                                    case MSG_MANUALSCORE_INSTRUCTION_NOTIFY:
-                                        //评分说明通知
-                                        Log.e("tag", "评分说明通知" + s);
-                                        MessageCallbackMap.notifyPage("Main", packet, s, body);
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                Log.e("tag", "收到数据:" + s);
+                        byte parseSum = checkSum(checkBytes, 0, checkBytes.length);
+                        byte sum = bytes[bytes.length - 2];//校验码
+                        //校验码比对
+                        if (parseSum == sum) {
+                            short packet = getPacketType(data.getHeadBytes());//获取报文类型
+                            String s = null;
+                            try {
+                                s = new String(body, "UTF-8");
+                            } catch (UnsupportedEncodingException e) {
+                                e.printStackTrace();
                             }
-                        } else {
-                            Log.e("tag", "收到数据:无结尾符");
+                            switch (packet) {
+                                case ApiManager.MSG_MANUALSCORE_LOGIN_REPLY:
+                                    //登录反馈
+                                    Log.e("tag", "登录回复" + s);
+                                    MessageCallbackMap.notifyPage("Login", packet, s, body);
+                                    break;
+                                case MSG_MANUALSCORE_LOGINOUT_REPLY:
+                                    //登出反馈
+                                    Log.e("tag", "登出回复" + s);
+                                    MessageCallbackMap.notifyPage("Main", packet, s, body);
+                                    break;
+                                case MSG_MANUALSCORE_CACHE_REPLY:
+                                    //缓存反馈
+                                    Log.e("tag", "缓存反馈" + s);
+                                    MessageCallbackMap.notifyPage("Main", packet, s, body);
+                                    break;
+                                case MSG_MANUALSCORE_FILESEND:
+                                    //评分表文件发送
+                                    Log.e("tag", "评分表文件发送" + s);
+                                    MessageCallbackMap.notifyPage("Main", packet, s, body);
+                                    break;
+                                case MSG_MANUALSCORE_REPLACE_NOTIFY:
+                                    //占位符替换数据通知
+                                    Log.e("tag", "占位符替换数据通知" + s);
+                                    MessageCallbackMap.notifyPage("Main", packet, s, body);
+                                    break;
+                                case MSG_MANUALSCORE_TASKLISTSTATE_NOTIFY:
+                                    //任务状态变化通知
+                                    Log.e("tag", "任务状态变化通知" + s);
+                                    MessageCallbackMap.notifyPage("Main", packet, s, body);
+                                    break;
+                                case MSG_MANUALSCORE_ASK_NOTIFY:
+                                    //问询通知
+                                    Log.e("tag", "问询通知" + s);
+                                    MessageCallbackMap.notifyPage("Main", packet, s, body);
+                                    break;
+                                case MSG_MANUALSCORE_UPLOADSCORE_REPLY:
+                                    //评分上传反馈
+                                    Log.e("tag", "评分上传反馈" + s);
+                                    MessageCallbackMap.notifyPage("Main", packet, s, body);
+                                    break;
+                                case MSG_MANUALSCORE_EXAMEND_NOTIFY:
+                                    //考试结束通知
+                                    Log.e("tag", "考试结束通知" + s);
+                                    MessageCallbackMap.notifyPage("Main", packet, s, body);
+                                    break;
+                                case MSG_MANUALSCORE_DIFFJUDGMENTS_REPLY:
+                                    //定位不同反馈
+                                    Log.e("tag", "定位不同反馈" + s);
+                                    MessageCallbackMap.notifyPage("Main", packet, s, body);
+                                    break;
+                                case MSG_TOTALGRADEFORM_REPLY:
+                                    //总成绩单反馈
+                                    Log.e("tag", "总成绩单反馈" + s);
+                                    MessageCallbackMap.notifyPage("Main", packet, s, body);
+                                    break;
+                                case MSG_MANUALSCORE_INSTRUCTION_NOTIFY:
+                                    //评分说明通知
+                                    Log.e("tag", "评分说明通知" + s);
+                                    MessageCallbackMap.notifyPage("Main", packet, s, body);
+                                    break;
+                                default:
+                                    break;
+                            }
+                            Log.e("tag", "收到数据:" + s);
                         }
+                    } else {
+                        Log.e("tag", "收到数据:无结尾符");
+                    }
                 }
                 if (manager != null) {//是否是心跳返回包,需要解析服务器返回的数据才可知道
                     //喂狗操作
@@ -336,31 +337,45 @@ public class MessageSender {
         }
     }
 
+    /**
+     * 关闭连接
+     */
+    public static void close() {
+        isExit = true;
+        manager.disconnect();
+        manager=null;
+    }
+
     public static class ReconnectionManager extends AbsReconnectionManager {
 
         @Override
         public void onSocketDisconnection(ConnectionInfo connectionInfo, String s, Exception e) {
             Log.e("tag", "连接 onSocketDisconnection");
-            handler.removeCallbacksAndMessages(null);
-            reconnect();
+            if (!isExit) {
+                handler.removeCallbacksAndMessages(null);
+                reconnect();
+            }
         }
 
         @Override
         public void onSocketConnectionSuccess(ConnectionInfo connectionInfo, String s) {
             Log.e("tag", "连接 onSocketConnectionSuccess");
             handler.removeCallbacksAndMessages(null);
+            isExit = false;
         }
 
         @Override
         public void onSocketConnectionFailed(ConnectionInfo connectionInfo, String s, Exception e) {
             Log.e("tag", "连接 onSocketConnectionFailed");
-            handler.removeCallbacksAndMessages(null);
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    reconnect();
-                }
-            }, 1000);
+            if (!isExit) {
+                handler.removeCallbacksAndMessages(null);
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        reconnect();
+                    }
+                }, 1000);
+            }
         }
     }
 

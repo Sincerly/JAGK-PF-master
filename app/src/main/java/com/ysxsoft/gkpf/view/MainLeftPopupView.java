@@ -22,14 +22,13 @@ public class MainLeftPopupView extends DrawerPopupView {
 
     private Context context;
     private LeftPopupAdapter leftAdapter;
-    private MainActivity.LeftItemClickListener itemClickListener;
     private List<TaskListResponse> taskList;
 
-    public MainLeftPopupView(@NonNull Context context, List<TaskListResponse> taskList, MainActivity.LeftItemClickListener itemClickListener) {
+    public MainLeftPopupView(@NonNull Context context, List<TaskListResponse> taskList ,LeftPopupAdapter leftPopupAdapter) {
         super(context);
         this.context = context;
         this.taskList = taskList;
-        this.itemClickListener = itemClickListener;
+        this.leftAdapter=leftPopupAdapter;
     }
 
     @Override
@@ -46,9 +45,7 @@ public class MainLeftPopupView extends DrawerPopupView {
 
         RecyclerView recyclerView = findViewById(R.id.rv_activity_main_left_dialog);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        leftAdapter = new LeftPopupAdapter(R.layout.activity_main_left_dialog_item);
         recyclerView.setAdapter(leftAdapter);
-        leftAdapter.setOnItemClickListener(itemClickListener);
         leftAdapter.setNewData(taskList);
     }
 

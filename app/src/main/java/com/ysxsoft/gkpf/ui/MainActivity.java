@@ -29,6 +29,7 @@ import com.ysxsoft.gkpf.bean.response.TaskListResponse;
 import com.ysxsoft.gkpf.config.AppConfig;
 import com.ysxsoft.gkpf.ui.adapter.ContentFragmentAdapter;
 import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
+import com.ysxsoft.gkpf.ui.adapter.LeftPopupAdapter;
 import com.ysxsoft.gkpf.utils.FileUtils;
 import com.ysxsoft.gkpf.utils.JsonUtils;
 import com.ysxsoft.gkpf.utils.ShareUtils;
@@ -73,11 +74,12 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     TextView upload;
 
     private LeftAdapter leftAdapter;
+    private LeftPopupAdapter leftPopupAdapter;
     private LeftItemClickListener leftItemClick;
     List<TaskListResponse> taskList;
     //List<CacheResponse.DataBean> cacheResponses;
-    Map<String,List<CacheResponse>> cacheResponses;
-    private String missionId="";//TODO:考试ID
+    Map<String, List<CacheResponse>> cacheResponses;
+    private String missionId = "";//TODO:考试ID
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +89,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         initView();
 
         MessageCallbackMap.reg("Main", this);
-        //ApiManager.logout();//退出登录
+//        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
         initList("");
         initCache("");
@@ -95,6 +97,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
 
     /**
      * 任务状态变化通知  处理服务器返回值
+     *
      * @param json
      * @return
      */
@@ -145,29 +148,29 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     /**
      * 请求缓存 处理服务器返回值
      */
-    private void initCache(String json){
+    private void initCache(String json) {
         if (cacheResponses == null) {
             cacheResponses = new HashMap<>();
-        }else{
+        } else {
             cacheResponses.clear();
         }
-        json="{\"groupId\":\"1\",\"requestId\":1,\"flowName1\":[{\"score\":1.5,\"isConfirmed\":false},{ \"score\":5,\"isConfirmed\":false}],\"flowName2\":[{\"score\":5,\"isConfirmed\":true},{\"score\":5, \"isConfirmed\":false}]}";
+        json = "{\"groupId\":\"1\",\"requestId\":1,\"flowName1\":[{\"score\":1.5,\"isConfirmed\":false},{ \"score\":5,\"isConfirmed\":false}],\"flowName2\":[{\"score\":5,\"isConfirmed\":true},{\"score\":5, \"isConfirmed\":false}]}";
         try {
-            JSONObject jsonObject=new JSONObject(json);
-            Iterator<String> keys=jsonObject.keys();
-            while (keys.hasNext()){
-                String key=keys.next();
-                if ("groupId".equals(key)){
-                    String groupId=jsonObject.getString("groupId");
-                }else if ("requestId".equals(key)){
-                    int requestId=jsonObject.getInt("requestId");
-                }else {
-                    JSONArray array=jsonObject.getJSONArray(key);
-                    List<CacheResponse> list=new ArrayList<>();
-                    for (int i = 0; i <array.length() ; i++) {
-                        JSONObject object=array.getJSONObject(i);
-                        Object score=object.get("score");
-                        boolean isConfirmed=(boolean)object.get("isConfirmed");
+            JSONObject jsonObject = new JSONObject(json);
+            Iterator<String> keys = jsonObject.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                if ("groupId".equals(key)) {
+                    String groupId = jsonObject.getString("groupId");
+                } else if ("requestId".equals(key)) {
+                    int requestId = jsonObject.getInt("requestId");
+                } else {
+                    JSONArray array = jsonObject.getJSONArray(key);
+                    List<CacheResponse> list = new ArrayList<>();
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject object = array.getJSONObject(i);
+                        Object score = object.get("score");
+                        boolean isConfirmed = (boolean) object.get("isConfirmed");
                         //返回值封装数据
                         CacheResponse response=new CacheResponse();
                         response.setScore(score);
@@ -193,19 +196,19 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         request.setUserName(ShareUtils.getUserName());
         Map<String,List<LinkedHashMap<String,Object>>> stepMap=new HashMap<>();
 
-        Set<String> set=cacheResponses.keySet();
-        Iterator<String> keys=set.iterator();
+        Set<String> set = cacheResponses.keySet();
+        Iterator<String> keys = set.iterator();
         //放文件
-        while (keys.hasNext()){
-            String key=keys.next();
-            List<LinkedHashMap<String,Object>> flowName1=new ArrayList<>();
-            List<CacheResponse> item=cacheResponses.get(key);
-            if(item!=null){
-                for (int i = 0; i <item.size() ; i++) {
-                    CacheResponse cacheResponse=item.get(i);
-                    LinkedHashMap<String,Object> objectMap=new LinkedHashMap<>();
-                    objectMap.put("score",cacheResponse.getScore());
-                    objectMap.put("isConfirmed",cacheResponse.isConfirmed());
+        while (keys.hasNext()) {
+            String key = keys.next();
+            List<LinkedHashMap<String, Object>> flowName1 = new ArrayList<>();
+            List<CacheResponse> item = cacheResponses.get(key);
+            if (item != null) {
+                for (int i = 0; i < item.size(); i++) {
+                    CacheResponse cacheResponse = item.get(i);
+                    LinkedHashMap<String, Object> objectMap = new LinkedHashMap<>();
+                    objectMap.put("score", cacheResponse.getScore());
+                    objectMap.put("isConfirmed", cacheResponse.isConfirmed());
                     flowName1.add(objectMap);
                 }
             }
@@ -216,6 +219,22 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         ApiManager.uploadScore(request);
     }
 
+    /**
+     * fragment单项上传
+     */
+    public void uploadByPosition(String fileName, int p, Object object, boolean isConfirm) {
+        if (cacheResponses != null) {
+            List<CacheResponse> list=cacheResponses.get(fileName);
+            for (int i = 0; i <list.size(); i++) {
+                if(i==p){
+                    list.get(i).setConfirmed(isConfirm);
+                    list.get(i).setScore(object);
+                }
+            }
+            upload();
+        }
+    }
+
     private void initView() {
         //左侧导航
         rvActivityMainLeft.setLayoutManager(new LinearLayoutManager(this));
@@ -223,6 +242,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         rvActivityMainLeft.setAdapter(leftAdapter);
         leftItemClick = new LeftItemClickListener();
         leftAdapter.setOnItemClickListener(leftItemClick);
+        leftPopupAdapter = new LeftPopupAdapter(R.layout.activity_main_left_dialog_item);
+        leftPopupAdapter.setOnItemClickListener(leftItemClick);
     }
 
     private void initLeftData() {
@@ -243,17 +264,16 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         verticalViewpager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
-
+                leftAdapter.setCurrPage(i);
+                leftPopupAdapter.setCurrPage(i);
             }
 
             @Override
             public void onPageSelected(int i) {
-
             }
 
             @Override
             public void onPageScrollStateChanged(int i) {
-                leftAdapter.setCurrPage(i);
             }
         });
     }
@@ -272,7 +292,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             case R.id.ll_activity_main_left:
                 new XPopup.Builder(this)
                         .popupPosition(PopupPosition.Left)//右边
-                        .asCustom(new MainLeftPopupView(this, taskList,leftItemClick))
+                        .asCustom(new MainLeftPopupView(this, taskList,leftPopupAdapter))
                         .show();
                 break;
             case R.id.upload:
@@ -302,6 +322,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
+                            MessageSender.close();
                             ToastUtils.showToast(MainActivity.this, "登出成功！", 300);
                             finish();
                         }

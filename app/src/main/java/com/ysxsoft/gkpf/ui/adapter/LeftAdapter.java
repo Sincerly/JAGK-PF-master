@@ -12,7 +12,7 @@ import com.ysxsoft.gkpf.bean.response.TaskListResponse;
 
 public class LeftAdapter extends BaseQuickAdapter<TaskListResponse, BaseViewHolder> {
 
-    private int currPage = 0;
+    private int currPage;
 
     public LeftAdapter(int layoutResId) {
         super(layoutResId);
@@ -21,11 +21,11 @@ public class LeftAdapter extends BaseQuickAdapter<TaskListResponse, BaseViewHold
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void convert(BaseViewHolder helper, TaskListResponse item) {
-        int currPos = helper.getLayoutPosition() + 1;
+        int currPos = helper.getLayoutPosition();
         TextView tv_num = helper.getView(R.id.tv_activity_main_left_item_num);
         LinearLayout ll_bg = helper.getView(R.id.ll_activity_main_left_item_bg);
 
-        tv_num.setText("" + currPos);
+        tv_num.setText("" + (currPos + 1));
 
         switch (item.getTaskState()) {
             case 1:
@@ -42,7 +42,7 @@ public class LeftAdapter extends BaseQuickAdapter<TaskListResponse, BaseViewHold
                 break;
         }
 
-        if(currPos==currPage){
+        if (currPos == currPage) {
             tv_num.setTextColor(mContext.getColor(R.color.white));
             ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_blue);
         }

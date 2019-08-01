@@ -12,6 +12,8 @@ import com.ysxsoft.gkpf.bean.response.TaskListResponse;
 
 public class LeftPopupAdapter extends BaseQuickAdapter<TaskListResponse, BaseViewHolder> {
 
+    private int currPage;
+
     public LeftPopupAdapter(int layoutResId) {
         super(layoutResId);
     }
@@ -37,10 +39,19 @@ public class LeftPopupAdapter extends BaseQuickAdapter<TaskListResponse, BaseVie
                 tv_num.setTextColor(mContext.getColor(R.color.main_left_black));
                 ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_gray);
                 break;
-            case 4:
-                tv_num.setTextColor(mContext.getColor(R.color.white));
-                ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_blue);
-                break;
         }
+
+        int currPos = helper.getLayoutPosition();
+        if (currPos == currPage) {
+            tv_num.setTextColor(mContext.getColor(R.color.white));
+            ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_blue);
+        }
+
     }
+
+    public void setCurrPage(int page) {
+        this.currPage = page;
+        this.notifyDataSetChanged();
+    }
+
 }
