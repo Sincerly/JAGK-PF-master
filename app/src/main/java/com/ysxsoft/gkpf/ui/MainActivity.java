@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.AbsoluteLayout;
 
 import com.chong.widget.verticalviewpager.DummyViewPager;
+import com.lxj.xpopup.XPopup;
+import com.lxj.xpopup.enums.PopupPosition;
 import com.ysxsoft.gkpf.R;
 import com.ysxsoft.gkpf.api.ApiManager;
 import com.ysxsoft.gkpf.api.IMessageCallback;
@@ -22,11 +24,13 @@ import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
 import com.ysxsoft.gkpf.utils.FileUtils;
 import com.ysxsoft.gkpf.utils.JsonUtils;
 import com.ysxsoft.gkpf.utils.ToastUtils;
+import com.ysxsoft.gkpf.view.MainLeftPopupView;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_ASK_NOTIFY;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_CACHE_REPLY;
@@ -44,8 +48,6 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
 
     @BindView(R.id.rv_activity_main_left)
     RecyclerView rvActivityMainLeft;
-    @BindView(R.id.base_view)
-    AbsoluteLayout baseView;
     @BindView(R.id.vertical_viewpager)
     DummyViewPager verticalViewpager;
 
@@ -96,6 +98,19 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 .set());
         //If you setting other scroll mode, the scrolled fade is shown from either side of display.
         verticalViewpager.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
+        verticalViewpager.setOffscreenPageLimit(5);
+    }
+
+    @OnClick(R.id.ll_activity_main_left)
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.ll_activity_main_left:
+                new XPopup.Builder(this)
+                        .popupPosition(PopupPosition.Left)//右边
+                        .asCustom(new MainLeftPopupView(this))
+                        .show();
+                break;
+        }
     }
 
     /**

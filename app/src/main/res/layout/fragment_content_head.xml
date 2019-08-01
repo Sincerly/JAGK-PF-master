@@ -10,6 +10,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/activity_main_right_bg">
-
     </AbsoluteLayout>
+
 </LinearLayout>

@@ -45,6 +45,8 @@ public class ContentFragment extends Fragment {
     private MyCell deFenView = null;     //得分列
     HashMap<String, TextView> peiFenViews = new HashMap<>();    //配分控件
     HashMap<String, TextView> deFenViews = new HashMap<>();     //得分控件
+    private TextView pfZjTv;    //配分总计单元格
+    private TextView dfZjTv;    //得分总计单元格
 
     public ContentFragment() {
     }
@@ -64,7 +66,7 @@ public class ContentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_content, container, false);
         initView(view);
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 super.run();
@@ -80,7 +82,7 @@ public class ContentFragment extends Fragment {
         baseRecycler.setOverScrollMode(View.OVER_SCROLL_NEVER);
         baseRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         LeftAdapter leftAdapter = new LeftAdapter(R.layout.activity_main_left_item);
-        View headView=View.inflate(getActivity(),R.layout.fragment_content_head,null);
+        View headView = View.inflate(getActivity(), R.layout.fragment_content_head, null);
         baseView = headView.findViewById(R.id.base_view);
         leftAdapter.addHeaderView(headView);
         baseRecycler.setAdapter(leftAdapter);
@@ -229,12 +231,21 @@ public class ContentFragment extends Fragment {
                                         if (deFenView != null && tempCell.getCol() == deFenView.getCol()) {     //列数等于得分列
                                             deFenViews.put("" + tempCell.getRow(), textView);
                                         }
+                                    } else if (huiZongView != null && tempCell.getRow() == huiZongView.getRow()) {
+                                        if (peiFenView != null && tempCell.getCol() == peiFenView.getCol()) {   //列数等于配分列
+                                            pfZjTv = textView;
+                                        }
+                                        if (deFenView != null && tempCell.getCol() == deFenView.getCol()) {     //列数等于得分列
+                                            dfZjTv = textView;
+                                        }
                                     }
                                 }
                             }
                             if (tempCell.getValue().toString().equals("汇总")) {
                                 TextView tv_button = itemBase.findViewById(R.id.tv_activity_main_right_hz);
                                 tv_button.setVisibility(View.VISIBLE);
+                                tv_button.setTag(tempCell);
+                                tv_button.setOnClickListener(new HuiZongClickListener());
                             }
                             baseView.addView(itemBase);
                         }
@@ -248,110 +259,61 @@ public class ContentFragment extends Fragment {
         }
     }
 
-    /**
-     * TODO
-     * Poi获取Excel元素，已弃用
-     */
-    private void initRightDataPoi() {
-        try {
-            HashMap<Integer, ArrayList<MyCell>> baseData = PoiExcelReadUtils.readExcelCell(getActivity(), "Excel模板(1).xls", 0);
-
-            baseView.setMinimumHeight(PoiExcelReadUtils.getTableHeight(PoiExcelReadUtils.sheet));
-
-            Iterator<Map.Entry<Integer, ArrayList<MyCell>>> iterator = baseData.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<Integer, ArrayList<MyCell>> entry = iterator.next();
-                entry.getKey();
-                ArrayList<MyCell> tempList = entry.getValue();
-                for (int i = 0; i < tempList.size(); i++) {
-                    if (!tempList.get(i).isCellRegion()) {      //判断单元格是否在合并单元格内，是否需要绘制
-                        continue;
-                    }
-                    MyCell tempCell = tempList.get(i);
-                    /*******************单元格位置*******************/
-                    int XValue = 0;     //单元格起始X位置
-                    int YValue = 0;     //单元格起始Y位置
-                    for (int col = 0; col < tempCell.getCol(); col++) {    //列数决定X位置
-                        XValue += tempList.get(col).getCellWidth();
-                    }
-                    for (int row = 0; row < tempCell.getRow(); row++) {    //行数决定Y位置
-                        YValue += baseData.get(row).get(i).getCellHeight();
-                    }
-                    tempCell.setIndexX(XValue);     //保存单元格X位置
-                    tempCell.setIndexY(YValue);     //保存单元格Y位置
-                    /*******************单元格位置*******************/
-                    /*******************单元格大小*******************/
-                    int widthValue = 0;
-                    int heightValue = 0;
-                    if (tempCell.getReginCol() > 0) {
-                        for (int col = 0; col < tempCell.getReginCol(); col++) {    //宽度加列数
-                            widthValue += tempList.get(tempCell.getCol() + col).getCellWidth();
-                        }
-                    } else {
-                        widthValue = tempList.get(tempCell.getCol()).getCellWidth();
-                    }
-                    if (tempCell.getReginRow() > 0) {
-                        for (int row = 0; row < tempCell.getReginRow(); row++) {    //高度加行数
-                            heightValue += baseData.get(tempCell.getRow() + row).get(tempCell.getCol()).getCellHeight();
-                        }
-                    } else {
-                        heightValue = baseData.get(tempCell.getRow()).get(tempCell.getCol()).getCellHeight();
-                    }
-                    tempCell.setViewWidth(widthValue);      //保存控件宽度
-                    tempCell.setViewHeight(heightValue);    //保存控件高度
-                    /*******************单元格大小*******************/
-
-                    LinearLayout itemBase = (LinearLayout) View.inflate(getActivity(), R.layout.activity_main_right_base_view, null);
-                    //大小
-                    itemBase.setLayoutParams(new LinearLayout.LayoutParams(widthValue, heightValue));
-                    //位置
-                    itemBase.setX(tempCell.getIndexX());
-                    itemBase.setY(tempCell.getIndexY());
-
-                    if (tempCell.getValue().toString().contains("对错")) {
-                        ImageView ivDui = itemBase.findViewById(R.id.iv_activity_main_right_item_item_dui);   //对
-                        ImageView ivCuo = itemBase.findViewById(R.id.iv_activity_main_right_item_item_cuo);   //错
-                        ivDui.setVisibility(View.VISIBLE);
-                        ivCuo.setVisibility(View.VISIBLE);
-                    }
-                    if (tempCell.getValue().toString().contains("调整")) {
-                        ImageView ivJia = itemBase.findViewById(R.id.iv_activity_main_right_item_item_jia);   //加
-                        ImageView ivJian = itemBase.findViewById(R.id.iv_activity_main_right_item_item_jian); //减
-                        ivJia.setVisibility(View.VISIBLE);
-                        ivJian.setVisibility(View.VISIBLE);
-                    }
-                    if ((!tempCell.getValue().toString().contains("对错")) && (!tempCell.getValue().toString().contains("调整"))) {
-                        TextView textView = itemBase.findViewById(R.id.tv_activity_main_right_content);
-                        textView.setVisibility(View.VISIBLE);
-                        //属性
-                        textView.setText(tempCell.getValue().toString());
-                        textView.setGravity(tempCell.getAlign());
-                    }
-                    baseView.addView(itemBase);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            ((BaseActivity) getActivity()).showToast("文件解析异常");
-        }
-    }
-
-    @OnClick(R.id.ll_activity_main_left)
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.ll_activity_main_left:
-                new XPopup.Builder(getActivity())
-                        .popupPosition(PopupPosition.Left)//右边
-                        .asCustom(new MainLeftPopupView(getActivity()))
-                        .show();
-                break;
-        }
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
     }
+
+    /**
+     * TODO 汇总点击时间
+     */
+    private class HuiZongClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            if (pfZjTv == null) {
+                ((BaseActivity) getActivity()).showToast("配分总计项未找到");
+                return;
+            }
+            if (dfZjTv == null) {
+                ((BaseActivity) getActivity()).showToast("得分总计项未找到");
+                return;
+            }
+            MyCell pfZjCell = (MyCell) pfZjTv.getTag();
+            MyCell dfZjCell = (MyCell) dfZjTv.getTag();
+            double pfzj = 0;
+            double dfzj = 0;
+            for (int i = xuHaoView.getRow() + 1; i < huiZongView.getRow(); i++) {
+                MyCell tempCell = (MyCell) peiFenViews.get("" + i).getTag();
+                Object tempValue = SystemUtils.getValueType(tempCell.getValue().toString());
+                if (!(tempValue instanceof String)) {
+                    pfzj += tempValue instanceof Integer ? (int) tempValue : (double) tempValue;
+                }
+                MyCell tempDfCell = (MyCell) deFenViews.get("" + i).getTag();
+                //若评判结果既没有选择【正确】，也没有选择【错误】，则点击汇总后，该项自动选择为正确
+                if (TextUtils.isEmpty(tempDfCell.getValue().toString())) {
+                    DuiClick(peiFenViews.get("" + i));
+                }
+                Object tempDfValue = SystemUtils.getValueType(tempDfCell.getValue().toString());
+                if (!(tempDfValue instanceof String)) {
+                    dfzj += tempDfValue instanceof Integer ? (int) tempDfValue : (double) tempDfValue;
+                }
+            }
+            if (pfzj == (int) pfzj) {
+                pfZjCell.setValue((int) pfzj);
+            } else {
+                pfZjCell.setValue(pfzj);
+            }
+            if (dfzj == (int) dfzj) {
+                dfZjCell.setValue((int) dfzj);
+            } else {
+                dfZjCell.setValue(dfzj);
+            }
+            pfZjTv.setText(pfZjCell.getValue().toString());
+            dfZjTv.setText(dfZjCell.getValue().toString());
+        }
+    }
+
 
     /**
      * TODO
@@ -361,25 +323,34 @@ public class ContentFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            MyCell myCell = (MyCell) v.getTag();
-            TextView currRowPfText = peiFenViews.get("" + myCell.getRow());
-            TextView currRowDfText = deFenViews.get("" + myCell.getRow());
-            MyCell pfCell = (MyCell) currRowPfText.getTag();
-            MyCell dfCell = (MyCell) currRowDfText.getTag();
-            double tempValue = Double.valueOf(pfCell.getValue().toString());
-            //评判结果是正数还是负数
-            //负数，做对了，得0分，做错了，得负分
-            if (tempValue < 0) {
-                dfCell.setValue(0);
-                currRowDfText.setText("0");
+            DuiClick(v);
+        }
+    }
+
+    /**
+     * 通用对号操作
+     *
+     * @param v
+     */
+    private void DuiClick(View v) {
+        MyCell myCell = (MyCell) v.getTag();
+        TextView currRowPfText = peiFenViews.get("" + myCell.getRow());
+        TextView currRowDfText = deFenViews.get("" + myCell.getRow());
+        MyCell pfCell = (MyCell) currRowPfText.getTag();
+        MyCell dfCell = (MyCell) currRowDfText.getTag();
+        double tempValue = Double.valueOf(pfCell.getValue().toString());
+        //评判结果是正数还是负数
+        //负数，做对了，得0分，做错了，得负分
+        if (tempValue < 0) {
+            dfCell.setValue(0);
+            currRowDfText.setText("0");
+        } else {
+            if (tempValue == (int) tempValue) {
+                dfCell.setValue((int) tempValue);
+                currRowDfText.setText("" + ((int) tempValue));
             } else {
-                if (tempValue == (int) tempValue) {
-                    dfCell.setValue((int) tempValue);
-                    currRowDfText.setText("" + ((int) tempValue));
-                } else {
-                    dfCell.setValue(tempValue);
-                    currRowDfText.setText("" + tempValue);
-                }
+                dfCell.setValue(tempValue);
+                currRowDfText.setText("" + tempValue);
             }
         }
     }
@@ -392,26 +363,30 @@ public class ContentFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            MyCell myCell = (MyCell) v.getTag();
-            TextView currRowPfText = peiFenViews.get("" + myCell.getRow());
-            TextView currRowDfText = deFenViews.get("" + myCell.getRow());
-            MyCell pfCell = (MyCell) currRowPfText.getTag();
-            MyCell dfCell = (MyCell) currRowDfText.getTag();
-            double tempValue = Double.valueOf(pfCell.getValue().toString());
-            //评判结果是正数还是负数
-            //负数，做对了，得0分，做错了，得负分
-            if (tempValue < 0) {
-                if (tempValue == (int) tempValue) {
-                    dfCell.setValue((int) tempValue);
-                    currRowDfText.setText("" + ((int) tempValue));
-                } else {
-                    dfCell.setValue(tempValue);
-                    currRowDfText.setText("" + tempValue);
-                }
+            CuoClick(v);
+        }
+    }
+
+    private void CuoClick(View v){
+        MyCell myCell = (MyCell) v.getTag();
+        TextView currRowPfText = peiFenViews.get("" + myCell.getRow());
+        TextView currRowDfText = deFenViews.get("" + myCell.getRow());
+        MyCell pfCell = (MyCell) currRowPfText.getTag();
+        MyCell dfCell = (MyCell) currRowDfText.getTag();
+        double tempValue = Double.valueOf(pfCell.getValue().toString());
+        //评判结果是正数还是负数
+        //负数，做对了，得0分，做错了，得负分
+        if (tempValue < 0) {
+            if (tempValue == (int) tempValue) {
+                dfCell.setValue((int) tempValue);
+                currRowDfText.setText("" + ((int) tempValue));
             } else {
-                dfCell.setValue(0);
-                currRowDfText.setText("0");
+                dfCell.setValue(tempValue);
+                currRowDfText.setText("" + tempValue);
             }
+        } else {
+            dfCell.setValue(0);
+            currRowDfText.setText("0");
         }
     }
 
