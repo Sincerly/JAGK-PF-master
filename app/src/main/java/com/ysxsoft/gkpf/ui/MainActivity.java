@@ -3,12 +3,14 @@ package com.ysxsoft.gkpf.ui;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.AbsoluteLayout;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chong.widget.verticalviewpager.DummyViewPager;
 import com.google.gson.Gson;
 import com.lxj.xpopup.XPopup;
@@ -59,6 +61,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     DummyViewPager verticalViewpager;
 
     private LeftAdapter leftAdapter;
+    private LeftItemClickListener leftItemClick;
     List<TaskListResponse> taskList;
 
     @Override
@@ -67,8 +70,6 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         initView();
-        initLeftData();
-        initViewPager();
 
         MessageCallbackMap.reg("Main", this);
         //ApiManager.logout();//退出登录
@@ -76,13 +77,19 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         initList("");
     }
 
+    /**
+     * 获取任务状态
+     *
+     * @param json
+     * @return
+     */
     private String initList(String json) {
         String missionId = "";//missionId
         if (taskList == null) {
             taskList = new ArrayList<>();
         }
         taskList.clear();
-        json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"flowName1\",\"flowName2\"]},{\"taskName\":\"taskName2\",\"taskState\":1,\"flowNameList\":[\"flowName3\",\"flowName4\"]}]}";
+        json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]},{\"taskName\":\"taskName2\",\"taskState\":2,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]}]}";
         try {
             JSONObject jsonObject = new JSONObject(json);
             String groupId = jsonObject.optString("groupId");
@@ -114,6 +121,9 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        //初始化ViewPager
+        initLeftData();
+        initViewPager();
         return missionId;
     }
 
@@ -122,33 +132,49 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         rvActivityMainLeft.setLayoutManager(new LinearLayoutManager(this));
         leftAdapter = new LeftAdapter(R.layout.activity_main_left_item);
         rvActivityMainLeft.setAdapter(leftAdapter);
+        leftItemClick = new LeftItemClickListener();
+        leftAdapter.setOnItemClickListener(leftItemClick);
     }
 
     private void initLeftData() {
-        ArrayList<String> temp = new ArrayList<>();
-        temp.add("");
-        temp.add("");
-        temp.add("");
-        temp.add("");
-        temp.add("");
-        temp.add("");
-        leftAdapter.setNewData(temp);
+        leftAdapter.setNewData(taskList);
     }
 
     private void initViewPager() {
         //viewPager.setPageTransformer(false, new ZoomOutTransformer());
         //viewPager.setPageTransformer(true, new StackTransformer());
-        String fileName = "Excel模板.xls";
-        verticalViewpager.setAdapter(new ContentFragmentAdapter.Holder(getSupportFragmentManager())
-                .add(ContentFragment.newInstance(fileName, 1, verticalViewpager))
-                .add(ContentFragment.newInstance(fileName, 2, verticalViewpager))
-                .add(ContentFragment.newInstance(fileName, 3, verticalViewpager))
-                .add(ContentFragment.newInstance(fileName, 4, verticalViewpager))
-                .add(ContentFragment.newInstance(fileName, 5, verticalViewpager))
-                .set());
+        ContentFragmentAdapter.Holder holder = new ContentFragmentAdapter.Holder(getSupportFragmentManager());
+        for (int i = 0; i < taskList.size(); i++) {
+            holder.add(ContentFragment.newInstance(taskList.get(i).getFlowName(), i, verticalViewpager));
+        }
+        verticalViewpager.setAdapter(holder.set());
         //If you setting other scroll mode, the scrolled fade is shown from either side of display.
         verticalViewpager.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
         verticalViewpager.setOffscreenPageLimit(5);
+        verticalViewpager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+    }
+
+    public class LeftItemClickListener implements BaseQuickAdapter.OnItemClickListener {
+
+        @Override
+        public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+            verticalViewpager.setCurrentItem(position, true);
+        }
     }
 
     @OnClick(R.id.ll_activity_main_left)
@@ -157,7 +183,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             case R.id.ll_activity_main_left:
                 new XPopup.Builder(this)
                         .popupPosition(PopupPosition.Left)//右边
-                        .asCustom(new MainLeftPopupView(this))
+                        .asCustom(new MainLeftPopupView(this, taskList,leftItemClick))
                         .show();
                 break;
         }

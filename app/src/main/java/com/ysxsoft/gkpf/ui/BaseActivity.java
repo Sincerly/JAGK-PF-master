@@ -47,11 +47,12 @@ public class BaseActivity extends AutoLayoutActivity {
      * 吐司
      */
     protected void showToast(String text) {
-        ToastUtils.showToast(this, text, 0);
+        runOnUiThread(() -> ToastUtils.showToast(BaseActivity.this, text, 0));
     }
 
     /**
      * 通用提示对话框，带title
+     *
      * @param title
      * @param msg
      */
@@ -64,6 +65,7 @@ public class BaseActivity extends AutoLayoutActivity {
 
     /**
      * 通用提示对话框，默认title
+     *
      * @param msg
      */
     protected void showAlert(String msg) {

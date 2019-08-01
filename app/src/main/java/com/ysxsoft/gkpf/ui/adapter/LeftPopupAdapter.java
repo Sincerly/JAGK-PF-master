@@ -10,22 +10,19 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.ysxsoft.gkpf.R;
 import com.ysxsoft.gkpf.bean.response.TaskListResponse;
 
-public class LeftAdapter extends BaseQuickAdapter<TaskListResponse, BaseViewHolder> {
+public class LeftPopupAdapter extends BaseQuickAdapter<TaskListResponse, BaseViewHolder> {
 
-    private int currPage = 0;
-
-    public LeftAdapter(int layoutResId) {
+    public LeftPopupAdapter(int layoutResId) {
         super(layoutResId);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void convert(BaseViewHolder helper, TaskListResponse item) {
-        int currPos = helper.getLayoutPosition() + 1;
         TextView tv_num = helper.getView(R.id.tv_activity_main_left_item_num);
         LinearLayout ll_bg = helper.getView(R.id.ll_activity_main_left_item_bg);
 
-        tv_num.setText("" + currPos);
+        tv_num.setText(item.getFlowName());
 
         switch (item.getTaskState()) {
             case 1:

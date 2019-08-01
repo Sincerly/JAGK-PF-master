@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:id="@+id/ll_activity_main_left_item_bg"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/activity_main_left_bg_gray"
         android:orientation="vertical">
@@ -20,7 +20,6 @@
             android:gravity="center"
             android:paddingLeft="20px"
             android:paddingRight="20px"
-            android:text="1标题标题标题标题标题标题标题标题标题"
             android:textColor="@color/main_left_black"
             android:textSize="20px"
             android:textStyle="bold"/>

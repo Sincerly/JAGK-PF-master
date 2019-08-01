@@ -9,19 +9,27 @@ import android.view.ViewGroup;
 
 import com.lxj.xpopup.core.DrawerPopupView;
 import com.ysxsoft.gkpf.R;
+import com.ysxsoft.gkpf.bean.response.TaskListResponse;
+import com.ysxsoft.gkpf.ui.MainActivity;
+import com.ysxsoft.gkpf.ui.adapter.LeftPopupAdapter;
 import com.ysxsoft.gkpf.utils.SystemUtils;
 import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainLeftPopupView extends DrawerPopupView {
 
     private Context context;
-    private LeftAdapter leftAdapter;
+    private LeftPopupAdapter leftAdapter;
+    private MainActivity.LeftItemClickListener itemClickListener;
+    private List<TaskListResponse> taskList;
 
-    public MainLeftPopupView(@NonNull Context context) {
+    public MainLeftPopupView(@NonNull Context context, List<TaskListResponse> taskList, MainActivity.LeftItemClickListener itemClickListener) {
         super(context);
-        this.context=context;
+        this.context = context;
+        this.taskList = taskList;
+        this.itemClickListener = itemClickListener;
     }
 
     @Override
@@ -36,22 +44,12 @@ public class MainLeftPopupView extends DrawerPopupView {
         ViewGroup.MarginLayoutParams params = (MarginLayoutParams) getPopupContentView().getLayoutParams();
         params.topMargin = SystemUtils.getStatusHeight((Activity) context);
 
-        RecyclerView recyclerView =findViewById(R.id.rv_activity_main_left_dialog);
+        RecyclerView recyclerView = findViewById(R.id.rv_activity_main_left_dialog);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        leftAdapter = new LeftAdapter(R.layout.activity_main_left_dialog_item);
+        leftAdapter = new LeftPopupAdapter(R.layout.activity_main_left_dialog_item);
         recyclerView.setAdapter(leftAdapter);
-        initData();
-    }
-
-    private void initData() {
-        ArrayList<String> temp = new ArrayList<>();
-        temp.add("");
-        temp.add("");
-        temp.add("");
-        temp.add("");
-        temp.add("");
-        temp.add("");
-        leftAdapter.setNewData(temp);
+        leftAdapter.setOnItemClickListener(itemClickListener);
+        leftAdapter.setNewData(taskList);
     }
 
 }
