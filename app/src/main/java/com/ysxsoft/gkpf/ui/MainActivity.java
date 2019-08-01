@@ -85,8 +85,6 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         initView();
-        initLeftData();
-        initViewPager();
 
         MessageCallbackMap.reg("Main", this);
         //ApiManager.logout();//退出登录
@@ -241,7 +239,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         verticalViewpager.setAdapter(holder.set());
         //If you setting other scroll mode, the scrolled fade is shown from either side of display.
         verticalViewpager.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
-        verticalViewpager.setOffscreenPageLimit(5);
+        verticalViewpager.setOffscreenPageLimit(taskList.size());
         verticalViewpager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
@@ -255,7 +253,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
 
             @Override
             public void onPageScrollStateChanged(int i) {
-
+                leftAdapter.setCurrPage(i);
             }
         });
     }

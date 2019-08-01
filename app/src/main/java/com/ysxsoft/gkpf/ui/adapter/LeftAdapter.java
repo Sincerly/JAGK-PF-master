@@ -40,10 +40,18 @@ public class LeftAdapter extends BaseQuickAdapter<TaskListResponse, BaseViewHold
                 tv_num.setTextColor(mContext.getColor(R.color.main_left_black));
                 ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_gray);
                 break;
-            case 4:
-                tv_num.setTextColor(mContext.getColor(R.color.white));
-                ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_blue);
-                break;
         }
+
+        if(currPos==currPage){
+            tv_num.setTextColor(mContext.getColor(R.color.white));
+            ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_blue);
+        }
+
     }
+
+    public void setCurrPage(int page) {
+        this.currPage = page;
+        this.notifyDataSetChanged();
+    }
+
 }
