@@ -93,8 +93,6 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
 
         MessageCallbackMap.reg("Main", this);
 //        ApiManager.logout();//退出登录
-        //ApiManager.logout();//退出登录
-//        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
 //        initList("");
 //        initCache("");
@@ -177,15 +175,15 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                         Object score = object.get("score");
                         boolean isConfirmed = (boolean) object.get("isConfirmed");
                         //返回值封装数据
-                        CacheResponse response=new CacheResponse();
+                        CacheResponse response = new CacheResponse();
                         response.setScore(score);
                         response.setConfirmed(isConfirmed);
                         list.add(response);
                     }
-                    cacheResponses.put(key,list);//放进map
+                    cacheResponses.put(key, list);//放进map
                 }
             }
-            Log.e("tag","cacheList:"+new Gson().toJson(cacheResponses));
+            Log.e("tag", "cacheList:" + new Gson().toJson(cacheResponses));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -194,12 +192,12 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     /**
      * 上传分数
      */
-    private void upload(){
-        UploadScoreRequest request=new UploadScoreRequest();
+    private void upload() {
+        UploadScoreRequest request = new UploadScoreRequest();
         request.setMissionId(missionId);
         request.setGroupId(ShareUtils.getGroup());
         request.setUserName(ShareUtils.getUserName());
-        Map<String,List<LinkedHashMap<String,Object>>> stepMap=new HashMap<>();
+        Map<String, List<LinkedHashMap<String, Object>>> stepMap = new HashMap<>();
 
         Set<String> set = cacheResponses.keySet();
         Iterator<String> keys = set.iterator();
@@ -217,10 +215,10 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                     flowName1.add(objectMap);
                 }
             }
-            stepMap.put(key,flowName1);
+            stepMap.put(key, flowName1);
         }
         request.setStepScores(stepMap);
-        System.out.println("data:"+new Gson().toJson(request));
+        System.out.println("data:" + new Gson().toJson(request));
         ApiManager.uploadScore(request);
     }
 
@@ -329,13 +327,13 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         }
     }
 
-    @OnClick({R.id.ll_activity_main_left,R.id.upload})
+    @OnClick({R.id.ll_activity_main_left, R.id.upload})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ll_activity_main_left:
                 new XPopup.Builder(this)
                         .popupPosition(PopupPosition.Left)//右边
-                        .asCustom(new MainLeftPopupView(this, taskList,leftPopupAdapter))
+                        .asCustom(new MainLeftPopupView(this, taskList, leftPopupAdapter))
                         .show();
                 break;
             case R.id.upload:
@@ -366,7 +364,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                         @Override
                         public void run() {
                             MessageSender.close();
-                            ToastUtils.showToast(MainActivity.this, "登出成功！", 300);
+                            showToast("登出成功！");
+                            startActivity(LoginActivity.class);
                             finish();
                         }
                     });
