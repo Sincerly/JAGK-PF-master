@@ -33,7 +33,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="85px"
                 android:clipToPadding="false"
-                android:paddingBottom="85px">
+                >
             </android.support.v7.widget.RecyclerView>
 
         </LinearLayout>

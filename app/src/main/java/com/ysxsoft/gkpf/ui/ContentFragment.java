@@ -45,6 +45,8 @@ public class ContentFragment extends Fragment {
     private MyCell deFenView = null;     //得分列
     HashMap<String, TextView> peiFenViews = new HashMap<>();    //配分控件
     HashMap<String, TextView> deFenViews = new HashMap<>();     //得分控件
+    HashMap<String, TextView> noPfViews = new HashMap<>();     //不需要评分控件
+
     private TextView pfZjTv;    //配分总计单元格
     private TextView dfZjTv;    //得分总计单元格
 
@@ -224,6 +226,8 @@ public class ContentFragment extends Fragment {
                                                 textView.setText("" + Math.abs(Integer.valueOf(tempCell.getValue().toString())));
                                             } else if (tempValue instanceof Double) {
                                                 textView.setText("" + Math.abs(Double.valueOf(tempCell.getValue().toString())));
+                                            } else {
+                                                noPfViews.put("" + tempCell.getRow(), textView);
                                             }
                                             peiFenViews.put("" + tempCell.getRow(), textView);
                                         }
@@ -353,6 +357,16 @@ public class ContentFragment extends Fragment {
                 currRowDfText.setText("" + tempValue);
             }
         }
+        //实时更新数据
+        Iterator<Map.Entry<String, TextView>> iterator = noPfViews.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, TextView> entry = iterator.next();
+            MyCell noPFCell=(MyCell) noPfViews.get(entry.getKey()).getTag();
+            if(myCell.getRow()>noPFCell.getRow()){
+
+            }
+        }
+
     }
 
     /**
@@ -367,7 +381,7 @@ public class ContentFragment extends Fragment {
         }
     }
 
-    private void CuoClick(View v){
+    private void CuoClick(View v) {
         MyCell myCell = (MyCell) v.getTag();
         TextView currRowPfText = peiFenViews.get("" + myCell.getRow());
         TextView currRowDfText = deFenViews.get("" + myCell.getRow());
@@ -565,8 +579,8 @@ public class ContentFragment extends Fragment {
         }
     }
 
-    public void refreshMain(int p, Object object, boolean isConfirm){
-        MainActivity activity= (MainActivity) getActivity();
-        activity.uploadByPosition(getFileName(),p,object,isConfirm);
+    public void refreshMain(int p, Object object, boolean isConfirm) {
+        MainActivity activity = (MainActivity) getActivity();
+        activity.uploadByPosition(getFileName(), p, object, isConfirm);
     }
 }

@@ -31,6 +31,7 @@ import com.ysxsoft.gkpf.bean.response.UploadResponse;
 import com.ysxsoft.gkpf.config.AppConfig;
 import com.ysxsoft.gkpf.ui.adapter.ContentFragmentAdapter;
 import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
+import com.ysxsoft.gkpf.ui.adapter.LeftPopupAdapter;
 import com.ysxsoft.gkpf.utils.FileUtils;
 import com.ysxsoft.gkpf.utils.JsonUtils;
 import com.ysxsoft.gkpf.utils.ShareUtils;
@@ -76,6 +77,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     TextView upload;
 
     private LeftAdapter leftAdapter;
+    private LeftPopupAdapter leftPopupAdapter;
     private LeftItemClickListener leftItemClick;
     List<TaskListResponse> taskList;
     //List<CacheResponse.DataBean> cacheResponses;
@@ -88,11 +90,10 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         initView();
-//        initLeftData();
-//        initViewPager();
 
         MessageCallbackMap.reg("Main", this);
         //ApiManager.logout();//退出登录
+//        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
         initList("");
         initCache("");
@@ -175,15 +176,15 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                         Object score = object.get("score");
                         boolean isConfirmed = (boolean) object.get("isConfirmed");
                         //返回值封装数据
-                        CacheResponse response = new CacheResponse();
+                        CacheResponse response=new CacheResponse();
                         response.setScore(score);
                         response.setConfirmed(isConfirmed);
                         list.add(response);
                     }
-                    cacheResponses.put(key, list);//放进map
+                    cacheResponses.put(key,list);//放进map
                 }
             }
-            Log.e("tag", "cacheList:" + new Gson().toJson(cacheResponses));
+            Log.e("tag","cacheList:"+new Gson().toJson(cacheResponses));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -192,12 +193,12 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     /**
      * 上传分数
      */
-    private void upload() {
-        UploadScoreRequest request = new UploadScoreRequest();
+    private void upload(){
+        UploadScoreRequest request=new UploadScoreRequest();
         request.setMissionId(missionId);
         request.setGroupId(ShareUtils.getGroup());
         request.setUserName(ShareUtils.getUserName());
-        Map<String, List<LinkedHashMap<String, Object>>> stepMap = new HashMap<>();
+        Map<String,List<LinkedHashMap<String,Object>>> stepMap=new HashMap<>();
 
         Set<String> set = cacheResponses.keySet();
         Iterator<String> keys = set.iterator();
@@ -215,10 +216,10 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                     flowName1.add(objectMap);
                 }
             }
-            stepMap.put(key, flowName1);
+            stepMap.put(key,flowName1);
         }
         request.setStepScores(stepMap);
-        System.out.println("data:" + new Gson().toJson(request));
+        System.out.println("data:"+new Gson().toJson(request));
         ApiManager.uploadScore(request);
     }
 
@@ -283,6 +284,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         rvActivityMainLeft.setAdapter(leftAdapter);
         leftItemClick = new LeftItemClickListener();
         leftAdapter.setOnItemClickListener(leftItemClick);
+        leftPopupAdapter = new LeftPopupAdapter(R.layout.activity_main_left_dialog_item);
+        leftPopupAdapter.setOnItemClickListener(leftItemClick);
     }
 
     private void initLeftData() {
@@ -303,17 +306,16 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         verticalViewpager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
-
+                leftAdapter.setCurrPage(i);
+                leftPopupAdapter.setCurrPage(i);
             }
 
             @Override
             public void onPageSelected(int i) {
-
             }
 
             @Override
             public void onPageScrollStateChanged(int i) {
-
             }
         });
     }
@@ -326,13 +328,13 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         }
     }
 
-    @OnClick({R.id.ll_activity_main_left, R.id.upload})
+    @OnClick({R.id.ll_activity_main_left,R.id.upload})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.ll_activity_main_left:
                 new XPopup.Builder(this)
                         .popupPosition(PopupPosition.Left)//右边
-                        .asCustom(new MainLeftPopupView(this, taskList, leftItemClick))
+                        .asCustom(new MainLeftPopupView(this, taskList,leftPopupAdapter))
                         .show();
                 break;
             case R.id.upload:
