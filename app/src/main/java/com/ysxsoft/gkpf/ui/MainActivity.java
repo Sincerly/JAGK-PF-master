@@ -10,12 +10,14 @@ import android.view.View;
 import android.widget.AbsoluteLayout;
 
 import com.chong.widget.verticalviewpager.DummyViewPager;
+import com.google.gson.Gson;
 import com.ysxsoft.gkpf.R;
 import com.ysxsoft.gkpf.api.ApiManager;
 import com.ysxsoft.gkpf.api.IMessageCallback;
 import com.ysxsoft.gkpf.api.MessageCallbackMap;
 import com.ysxsoft.gkpf.bean.response.FileResponse;
 import com.ysxsoft.gkpf.bean.response.LogoutResponse;
+import com.ysxsoft.gkpf.bean.response.TaskListResponse;
 import com.ysxsoft.gkpf.config.AppConfig;
 import com.ysxsoft.gkpf.ui.adapter.ContentFragmentAdapter;
 import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
@@ -23,7 +25,12 @@ import com.ysxsoft.gkpf.utils.FileUtils;
 import com.ysxsoft.gkpf.utils.JsonUtils;
 import com.ysxsoft.gkpf.utils.ToastUtils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +57,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     DummyViewPager verticalViewpager;
 
     private LeftAdapter leftAdapter;
+    List<TaskListResponse> taskList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +70,49 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
 
         MessageCallbackMap.reg("Main", this);
         //ApiManager.logout();//退出登录
-        ApiManager.cache();//请求缓存
+        //ApiManager.cache();//请求缓存
+        initList("");
+    }
+
+    private String initList(String json) {
+        String missionId = "";//missionId
+        if (taskList == null) {
+            taskList = new ArrayList<>();
+        }
+        taskList.clear();
+        json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"flowName1\",\"flowName2\"]},{\"taskName\":\"taskName2\",\"taskState\":1,\"flowNameList\":[\"flowName3\",\"flowName4\"]}]}";
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            String groupId = jsonObject.optString("groupId");
+            int requestId = jsonObject.optInt("requestId");
+            missionId = jsonObject.optString("missionId");
+
+            JSONArray array = jsonObject.optJSONArray("taskInfoList");
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject item = array.getJSONObject(i);
+                String taskName = item.optString("taskName");
+                int taskState = item.optInt("taskState");
+
+                JSONArray flowNameList = item.optJSONArray("flowNameList");
+
+                for (int j = 0; j < flowNameList.length(); j++) {
+                    String flowName = flowNameList.getString(j);
+                    Log.e("tag", "flowName:" + flowName);
+
+                    TaskListResponse response = new TaskListResponse();
+                    response.setMissionId(missionId);
+                    response.setGroupId(groupId);
+                    response.setTaskState(taskState);
+                    response.setTaskName(taskName);
+                    response.setFlowName(flowName);
+                    taskList.add(response);
+                }
+            }
+            Log.e("tag", "json:" + new Gson().toJson(taskList));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return missionId;
     }
 
     private void initView() {
@@ -155,7 +205,10 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             case MSG_MANUALSCORE_TASKLISTSTATE_NOTIFY:
                 //任务状态变化通知
                 Log.e("tag", "任务状态变化通知");
-//                ApiManager.confirmTaskState();
+                String missionId = initList(json);
+                if (!"".equals(missionId)) {
+                    ApiManager.confirmTaskState(missionId);
+                }
                 break;
             case MSG_MANUALSCORE_ASK_NOTIFY:
                 //问询通知
