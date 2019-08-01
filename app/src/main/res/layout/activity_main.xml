@@ -133,12 +133,18 @@
                 android:background="#B5B5B5"
                 />
 
+            <com.chong.widget.verticalviewpager.DummyViewPager
+                android:id="@+id/vertical_viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
                 android:paddingBottom="20px"
-                android:paddingTop="20px">
+                android:paddingTop="20px"
+                android:visibility="gone">
 
                 <AbsoluteLayout
                     android:id="@+id/base_view"
