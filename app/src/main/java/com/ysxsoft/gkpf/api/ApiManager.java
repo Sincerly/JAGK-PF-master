@@ -4,6 +4,7 @@ import com.ysxsoft.gkpf.bean.request.BaseRequest;
 import com.ysxsoft.gkpf.bean.request.CacheRequest;
 import com.ysxsoft.gkpf.bean.request.ConfirmAskRequest;
 import com.ysxsoft.gkpf.bean.request.ConfirmExamAckRequest;
+import com.ysxsoft.gkpf.bean.request.ConfirmExamStartRequest;
 import com.ysxsoft.gkpf.bean.request.ConfirmFileRequest;
 import com.ysxsoft.gkpf.bean.request.ConfirmReplaceRequest;
 import com.ysxsoft.gkpf.bean.request.ConfirmTaskStateRequest;
@@ -30,6 +31,8 @@ public class ApiManager {
     public static final short MSG_MANUALSCORE_LOGIN_REPLY = 11;            //!< 登录请求反馈
     public static final short MSG_MANUALSCORE_LOGINOUT_REQUEST = 12;       //!< 登出请求
     public static final short MSG_MANUALSCORE_LOGINOUT_REPLY = 13;         //!< 登出请求反馈
+    public static final short MSG_MANUALSCORE_EXAMSTART_NOTIFY = 14;       //!< 考试开始通知
+    public static final short MSG_MANUALSCORE_EXAMSTART_ACK = 15;          //!< 考试开始接收确认
     public static final short MSG_MANUALSCORE_CACHE_REQUEST = 18;          //!< 评分缓存请求
     public static final short MSG_MANUALSCORE_CACHE_REPLY = 19;            //!< 评分缓存反馈
     public static final short MSG_MANUALSCORE_FILESEND = 20;               //!< 评分表文件发送
@@ -59,38 +62,45 @@ public class ApiManager {
      * @param pwd
      */
     public static void login(String name, String pwd, String groupId) {
-        LoginRequest requset = new LoginRequest();
-        requset.setUserName(name);
-        requset.setPassword(pwd);
-        requset.setGroupId(groupId);
-        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_LOGIN_REQUEST, requset);
+        LoginRequest request = new LoginRequest();
+        request.setUserName(name);
+        request.setPassword(pwd);
+        request.setGroupId(groupId);
+        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_LOGIN_REQUEST, request);
     }
 
     /**
      * 登出接口
      *
-     * @param name
-     * @param pwd
      */
     public static void logout() {
-        LogoutRequest requset = new LogoutRequest();
-        requset.setUserName(ShareUtils.getUserName());
-        requset.setPassword(ShareUtils.getUserPwd());
-        requset.setGroupId(ShareUtils.getGroup());
-        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_LOGINOUT_REQUEST, requset);
+        LogoutRequest request = new LogoutRequest();
+        request.setUserName(ShareUtils.getUserName());
+        request.setPassword(ShareUtils.getUserPwd());
+        request.setGroupId(ShareUtils.getGroup());
+        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_LOGINOUT_REQUEST, request);
+    }
+
+    /**
+     * 考试开始接收确认
+     * @param missionId
+     */
+    public static void confirmExamStart(String missionId){
+        ConfirmExamStartRequest request=new ConfirmExamStartRequest();
+        request.setMissionId(missionId);
+        request.setGroupId(ShareUtils.getGroup());
+        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_EXAMSTART_ACK, request);
     }
 
     /**
      * 请求缓存
      *
-     * @param name
-     * @param pwd
      */
     public static void cache() {
-        CacheRequest requset = new CacheRequest();
-        requset.setUserName(ShareUtils.getUserName());
-        requset.setGroupId(ShareUtils.getGroup());
-        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_CACHE_REQUEST, requset);
+        CacheRequest request = new CacheRequest();
+        request.setUserName(ShareUtils.getUserName());
+        request.setGroupId(ShareUtils.getGroup());
+        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_CACHE_REQUEST, request);
     }
 
     /**
@@ -98,10 +108,10 @@ public class ApiManager {
      * @param fileName
      */
     public static void confirmFile(String fileName) {
-        ConfirmFileRequest requset = new ConfirmFileRequest();
-        requset.setFileName(fileName);
-        requset.setGroupId(ShareUtils.getGroup());
-        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_FILESEND_ACK, requset);
+        ConfirmFileRequest request = new ConfirmFileRequest();
+        request.setFileName(fileName);
+        request.setGroupId(ShareUtils.getGroup());
+        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_FILESEND_ACK, request);
     }
 
     /**
@@ -109,10 +119,10 @@ public class ApiManager {
      * @param flowNameList
      */
     public static void confirmReplace(List<String> flowNameList) {
-        ConfirmReplaceRequest requset = new ConfirmReplaceRequest();
-        requset.setFlowNameList(flowNameList);
-        requset.setGroupId(ShareUtils.getGroup());
-        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_REPLACE_ACK, requset);
+        ConfirmReplaceRequest request = new ConfirmReplaceRequest();
+        request.setFlowNameList(flowNameList);
+        request.setGroupId(ShareUtils.getGroup());
+        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_REPLACE_ACK, request);
     }
 
     /**
@@ -120,10 +130,10 @@ public class ApiManager {
      * @param missionId
      */
     public static void confirmTaskState(String missionId) {
-        ConfirmTaskStateRequest requset = new ConfirmTaskStateRequest();
-        requset.setMissionId(missionId);
-        requset.setGroupId(ShareUtils.getGroup());
-        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_TASKLISTSTATE_ACK, requset);
+        ConfirmTaskStateRequest request = new ConfirmTaskStateRequest();
+        request.setMissionId(missionId);
+        request.setGroupId(ShareUtils.getGroup());
+        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_TASKLISTSTATE_ACK, request);
     }
 
     /**
@@ -131,10 +141,10 @@ public class ApiManager {
      * @param flowName  流程名
      */
     public static void confirmAsk(String flowName) {
-        ConfirmAskRequest requset = new ConfirmAskRequest();
-        requset.setFlowName(flowName);
-        requset.setGroupId(ShareUtils.getGroup());
-        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_ASK_ACK, requset);
+        ConfirmAskRequest request = new ConfirmAskRequest();
+        request.setFlowName(flowName);
+        request.setGroupId(ShareUtils.getGroup());
+        MessageSender.sendMessage(ApiManager.MSG_MANUALSCORE_ASK_ACK, request);
     }
 
     /**
@@ -147,7 +157,7 @@ public class ApiManager {
 
     /**
      * 考试结束接收确认
-     * @param request
+     * @param missionId 考试id
      */
     public static void confirmExamAck(String missionId) {
         ConfirmExamAckRequest request=new ConfirmExamAckRequest();
@@ -158,7 +168,7 @@ public class ApiManager {
 
     /**
      * 定位不同请求
-     * @param  考试id
+     * @param  missionId 考试id
      */
     public static void diff(String missionId) {
         DiffRequest request=new DiffRequest();
@@ -169,7 +179,7 @@ public class ApiManager {
 
     /**
      * 总成绩单请求
-     * @param  考试id
+     * @param  missionId 考试id
      */
     public static void totalGradeRequest(String missionId) {
         TotalGradeRequest request=new TotalGradeRequest();

@@ -25,7 +25,9 @@ import com.ysxsoft.gkpf.bean.request.UploadScoreRequest;
 import com.ysxsoft.gkpf.bean.response.CacheResponse;
 import com.ysxsoft.gkpf.bean.response.FileResponse;
 import com.ysxsoft.gkpf.bean.response.LogoutResponse;
+import com.ysxsoft.gkpf.bean.response.ScoreNotifyResponse;
 import com.ysxsoft.gkpf.bean.response.TaskListResponse;
+import com.ysxsoft.gkpf.bean.response.UploadResponse;
 import com.ysxsoft.gkpf.config.AppConfig;
 import com.ysxsoft.gkpf.ui.adapter.ContentFragmentAdapter;
 import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
@@ -56,6 +58,7 @@ import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_ASK_NOTIFY;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_CACHE_REPLY;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_DIFFJUDGMENTS_REPLY;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_EXAMEND_NOTIFY;
+import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_EXAMSTART_NOTIFY;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_FILESEND;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_INSTRUCTION_NOTIFY;
 import static com.ysxsoft.gkpf.api.ApiManager.MSG_MANUALSCORE_LOGINOUT_REPLY;
@@ -90,6 +93,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
 
         MessageCallbackMap.reg("Main", this);
 //        ApiManager.logout();//退出登录
+        //ApiManager.logout();//退出登录
+//        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
 //        initList("");
 //        initCache("");
@@ -116,7 +121,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
 
             JSONArray array = jsonObject.optJSONArray("taskInfoList");
             for (int i = 0; i < array.length(); i++) {
-                JSONObject item = array.getJSONObject(i);
+                JSONObject item = array.optJSONObject(i);
                 String taskName = item.optString("taskName");
                 int taskState = item.optInt("taskState");
 
@@ -161,14 +166,14 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             while (keys.hasNext()) {
                 String key = keys.next();
                 if ("groupId".equals(key)) {
-                    String groupId = jsonObject.getString("groupId");
+                    String groupId = jsonObject.optString("groupId");
                 } else if ("requestId".equals(key)) {
-                    int requestId = jsonObject.getInt("requestId");
+                    int requestId = jsonObject.optInt("requestId");
                 } else {
-                    JSONArray array = jsonObject.getJSONArray(key);
+                    JSONArray array = jsonObject.optJSONArray(key);
                     List<CacheResponse> list = new ArrayList<>();
                     for (int i = 0; i < array.length(); i++) {
-                        JSONObject object = array.getJSONObject(i);
+                        JSONObject object = array.optJSONObject(i);
                         Object score = object.get("score");
                         boolean isConfirmed = (boolean) object.get("isConfirmed");
                         //返回值封装数据
@@ -224,14 +229,52 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
      */
     public void uploadByPosition(String fileName, int p, Object object, boolean isConfirm) {
         if (cacheResponses != null) {
-            List<CacheResponse> list=cacheResponses.get(fileName);
-            for (int i = 0; i <list.size(); i++) {
-                if(i==p){
+            List<CacheResponse> list = cacheResponses.get(fileName);
+            boolean isEdited = false;
+            for (int i = 0; i < list.size(); i++) {
+                if (i == p) {
                     list.get(i).setConfirmed(isConfirm);
                     list.get(i).setScore(object);
                 }
             }
             upload();
+        }
+    }
+
+    Map<String, LinkedHashMap<String, String>> replaceMap;
+
+    private void initReplaceNotify(String json) {
+        if (replaceMap == null) {
+            replaceMap = new HashMap<>();
+        } else {
+            replaceMap.clear();
+        }
+        json = "{\"groupId\":\"1\",\"requestId\":1,\"flowName1\":{\"replaceholder1\":\"替换1\",\"replaceholder2\":\"替换2\",\"replaceholder3\":\"替换33\"},\"flowName2\":{\"replaceholder4\":\"替换4\",\"replaceholder5\":\"替换5\",\"replaceholder6\":\"替换6\"}}";
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            Iterator<String> keys = jsonObject.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                if ("groupId".equals(key)) {
+                    String groupId = jsonObject.optString("groupId");
+                } else if ("requestId".equals(key)) {
+                    int requestId = jsonObject.optInt("requestId");
+                } else {
+                    LinkedHashMap<String, String> map = new LinkedHashMap();
+
+                    JSONObject flowObject = new JSONObject(json);
+                    Iterator<String> flowKeyList = flowObject.keys();
+                    while (flowKeyList.hasNext()) {
+                        String flowKey = flowKeyList.next();
+                        String placeHolderStr = flowObject.optString(flowKey);
+                        map.put(flowKey, placeHolderStr);//替换内容
+                    }
+                    replaceMap.put(key, map);//放进map
+                }
+            }
+            Log.e("tag", "replaceList:" + new Gson().toJson(replaceMap));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -331,6 +374,16 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                     //退出失败
                 }
                 break;
+            case MSG_MANUALSCORE_EXAMSTART_NOTIFY:
+                Log.e("tag", "考试开始通知");
+                try {
+                    JSONObject jsonObject = new JSONObject(json);
+                    missionId = jsonObject.optString("missionId");
+                    ApiManager.confirmExamStart(missionId);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
             case MSG_MANUALSCORE_CACHE_REPLY:
                 //缓存反馈
                 Log.e("tag", "缓存反馈");
@@ -356,42 +409,61 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 Log.e("tag", "占位符替换数据通知");
                 //{"flowName1":{"replaceholder1":"","replaceholder2":"","replaceholder3":""},"flowName2":{"replaceholder1":"","replaceholder2":"","replaceholder3":""},"groupId":1,"requestId":1}
                 //flowName1动态key
-//                ApiManager.confirmReplace("");
+//               ApiManager.confirmReplace("");
                 break;
             case MSG_MANUALSCORE_TASKLISTSTATE_NOTIFY:
                 //任务状态变化通知
                 Log.e("tag", "任务状态变化通知");
-                String missionId = initList(json);
-                if (!"".equals(missionId)) {
-                    ApiManager.confirmTaskState(missionId);
+                String missionid = initList(json);
+                if (!"".equals(missionid)) {
+                    ApiManager.confirmTaskState(missionid);
                 }
                 break;
             case MSG_MANUALSCORE_ASK_NOTIFY:
                 //问询通知
                 Log.e("tag", "问询通知");
-//                ApiManager.confirmAsk();
+//              ApiManager.confirmAsk();
                 break;
             case MSG_MANUALSCORE_UPLOADSCORE_REPLY:
                 //评分上传反馈
-//                Log.e("tag", "评分上传反馈");
+                Log.e("tag", "评分上传反馈");
+//                UploadResponse uploadResponse=JsonUtils.parseByGson(json,UploadResponse.class);
+//                if(uploadResponse!=null){
+//                    if(uploadResponse.isResult()){
+//                        //上传成功
+//                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                ToastUtils.showToast(MainActivity.this, "上传成功！", 300);
+//                            }
+//                        });
+//                    }else{
+//                        //上传失败
+//                    }
+//                }
                 break;
             case MSG_MANUALSCORE_EXAMEND_NOTIFY:
                 //考试结束通知
                 Log.e("tag", "考试结束通知");
-//                ApiManager.confirmExamAck();//考试结束接收确认
+                ApiManager.confirmExamAck(missionId);//考试结束接收确认
                 break;
             case MSG_MANUALSCORE_DIFFJUDGMENTS_REPLY:
                 //定位不同反馈
-//                Log.e("tag", "定位不同反馈");
+                Log.e("tag", "定位不同反馈");
                 break;
             case MSG_TOTALGRADEFORM_REPLY:
                 //总成绩单反馈
-//                Log.e("tag", "总成绩单反馈");
+                Log.e("tag", "总成绩单反馈");
                 break;
             case MSG_MANUALSCORE_INSTRUCTION_NOTIFY:
                 //评分说明通知
                 Log.e("tag", "评分说明通知");
-//                ApiManager.confirmInstruction();//评分说明接收确认
+                ScoreNotifyResponse scoreNotifyResponse = JsonUtils.parseByGson(json, ScoreNotifyResponse.class);
+                if (scoreNotifyResponse != null) {
+                    String instruction = scoreNotifyResponse.getInstruction();//说明通知
+                    ShareUtils.setInstruction(instruction);
+                    ApiManager.confirmInstruction();//评分说明接收确认
+                }
                 break;
         }
     }
