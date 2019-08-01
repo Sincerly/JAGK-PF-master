@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 
 public class UploadScoreRequest  extends BaseRequest {
 
@@ -18,7 +19,7 @@ public class UploadScoreRequest  extends BaseRequest {
     private String groupId;
     private String userName;
     private String missionId;
-    private Map<String,List<Map<String,Object>>> stepScores;
+    private Map<String,List<LinkedHashMap<String,Object>>> stepScores;
 
     public String getGroupId() {
         return groupId;
@@ -44,11 +45,11 @@ public class UploadScoreRequest  extends BaseRequest {
         this.missionId = missionId;
     }
 
-    public Map<String, List<Map<String, Object>>> getStepScores() {
+    public Map<String, List<LinkedHashMap<String, Object>>> getStepScores() {
         return stepScores;
     }
 
-    public void setStepScores(Map<String, List<Map<String, Object>>> stepScores) {
+    public void setStepScores(Map<String, List<LinkedHashMap<String, Object>>> stepScores) {
         this.stepScores = stepScores;
     }
 
@@ -58,18 +59,18 @@ public class UploadScoreRequest  extends BaseRequest {
         request.setMissionId("2");
         request.setGroupId("1");
         request.setUserName("3");
-        Map<String,List<Map<String,Object>>> stepMap=new HashMap<>();
+        Map<String,List<LinkedHashMap<String,Object>>> stepMap=new HashMap<>();
 
-        List<Map<String,Object>> flowName1=new ArrayList<>();
-        Map<String,Object> objectMap=new HashMap<>();
+        List<LinkedHashMap<String,Object>> flowName1=new ArrayList<>();
+        LinkedHashMap<String,Object> objectMap=new LinkedHashMap<>();
         objectMap.put("score",2.0);
         objectMap.put("isConfirmed",false);
         flowName1.add(objectMap);
         flowName1.add(objectMap);
         stepMap.put("flowName1",flowName1);
 
-        List<Map<String,Object>> flowName2=new ArrayList<>();
-        Map<String,Object> objectMap2=new HashMap<>();
+        List<LinkedHashMap<String,Object>> flowName2=new ArrayList<>();
+        LinkedHashMap<String,Object> objectMap2=new LinkedHashMap<>();
         objectMap2.put("score",5);
         objectMap2.put("isConfirmed",false);
         flowName2.add(objectMap2);
