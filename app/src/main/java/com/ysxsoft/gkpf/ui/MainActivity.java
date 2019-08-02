@@ -43,6 +43,7 @@ import com.ysxsoft.gkpf.utils.FileUtils;
 import com.ysxsoft.gkpf.utils.JsonUtils;
 import com.ysxsoft.gkpf.utils.ShareUtils;
 import com.ysxsoft.gkpf.view.MainLeftPopupView;
+import com.ysxsoft.gkpf.view.MultipleStatusView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +51,6 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -90,6 +90,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     NestedScrollView scrollView;
     @BindView(R.id.tv_curr_page_name)
     TextView tvCurrPageName;
+    @BindView(R.id.multipleStatusView)
+    MultipleStatusView multipleStatusView;
 
     private ContentFragmentAdapter fragmentAdapter;
     private LeftAdapter leftAdapter;
@@ -101,6 +103,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     private String missionId = "";//TODO:考试ID
 
     ContentFragmentAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,7 +114,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         MessageCallbackMap.reg("Main", this);
 //        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
-        initList("");
+//        initList("");
 //        initCache("");
     }
 
@@ -127,7 +130,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             taskList = new ArrayList<>();
         }
         taskList.clear();
-        json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"aaaaaa\",\"aaaaaa.xls\"]},{\"taskName\":\"taskName2\",\"taskState\":2,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]}]}";
+//        json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"aaaaaa\",\"aaaaaa.xls\"]},{\"taskName\":\"taskName2\",\"taskState\":2,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]}]}";
         try {
             JSONObject jsonObject = new JSONObject(json);
             String groupId = jsonObject.optString("groupId");
@@ -213,12 +216,12 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 String fileName = iterator.next();
                 //拿到缓存的页面值
                 CacheBean cacheBean = cachePageBeanMap.get(fileName);
-                int size=0;
-                if(cacheBean!=null){
-                     size = cacheBean.getSize();//缓存数量
+                int size = 0;
+                if (cacheBean != null) {
+                    size = cacheBean.getSize();//缓存数量
                 }
-                List<CacheResponse> responses =createEmptyList(cacheResponses.get(fileName),size);
-                cacheResponses.put(fileName,responses);//替换追加空的map
+                List<CacheResponse> responses = createEmptyList(cacheResponses.get(fileName), size);
+                cacheResponses.put(fileName, responses);//替换追加空的map
                 updatePageCache(fileName);//刷新页面
             }
             //拿到缓存page列表
@@ -238,7 +241,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         if (data == null) {
             data = new ArrayList<>();
         }
-        List<CacheResponse> d=null;
+        List<CacheResponse> d = null;
         if (data.size() < size) {
             //向集合追加空
             d = new ArrayList<>(size);
@@ -253,10 +256,10 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 d.add(response);
             }
         } else {
-            d=new ArrayList<>(size);
+            d = new ArrayList<>(size);
             //后台返回比前台多1个
-            for (int i = 0; i <size; i++) {
-                 d.add(data.get(i));
+            for (int i = 0; i < size; i++) {
+                d.add(data.get(i));
             }
         }
         return d;
@@ -421,7 +424,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         for (int i = 0; i < taskList.size(); i++) {
             holder.add(ContentFragment.newInstance(taskList.get(i).getFlowName(), i, verticalViewpager));
         }
-        fragmentAdapter=holder.set();
+        fragmentAdapter = holder.set();
         verticalViewpager.setAdapter(fragmentAdapter);
         //If you setting other scroll mode, the scrolled fade is shown from either side of display.
         verticalViewpager.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
@@ -431,7 +434,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             public void onPageScrolled(int i, float v, int i1) {
                 leftAdapter.setCurrPage(i);
                 leftPopupAdapter.setCurrPage(i);
-                tvCurrPageName.setText(((ContentFragment)fragmentAdapter.getItem(i)).getFileName());
+                tvCurrPageName.setText(((ContentFragment) fragmentAdapter.getItem(i)).getFileName());
             }
 
             @Override
@@ -463,7 +466,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 break;
             case R.id.upload:
                 //上传接口
-//                upload();
+                upload();
                 break;
         }
     }

@@ -1,163 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<com.ysxsoft.gkpf.view.MultipleStatusView
+    android:id="@+id/multipleStatusView"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     tools:context=".ui.MainActivity">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:id="@+id/ll_activity_main_left"
-            android:layout_width="88px"
-            android:layout_height="match_parent"
-            android:background="#1D2029"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10px"
-                android:src="@mipmap/activity_main_default_head"/>
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rv_activity_main_left"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="85px"
-                android:clipToPadding="false"
-                >
-            </android.support.v7.widget.RecyclerView>
-
-        </LinearLayout>
+        android:background="@color/white">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="80px"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:id="@+id/ll_activity_main_left"
+                android:layout_width="88px"
+                android:layout_height="match_parent"
+                android:background="#1D2029"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tv_curr_page_name"
+                <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="40px"
-                    android:textColor="#404040"
-                    android:textSize="30px"
-                    android:textStyle="bold"/>
+                    android:layout_marginTop="10px"
+                    android:src="@mipmap/activity_main_default_head"/>
 
-                <View
-                    android:layout_width="wrap_content"
-                    android:layout_height="1px"
-                    android:layout_weight="1"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rv_activity_main_left"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="50px"
-                    android:drawableLeft="@mipmap/activity_main_topbar_one_unselect"
-                    android:drawablePadding="10px"
-                    android:gravity="center"
-                    android:text="总成绩单"
-                    android:textColor="@color/topbar_text"
-                    android:textSize="22px"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:id="@+id/upload"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="50px"
-                    android:drawableLeft="@mipmap/activity_main_topbar_two_unselect"
-                    android:drawablePadding="10px"
-                    android:gravity="center"
-                    android:text="上传"
-                    android:textColor="@color/topbar_text"
-                    android:textSize="22px"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="50px"
-                    android:drawableLeft="@mipmap/activity_main_topbar_three_unselect"
-                    android:drawablePadding="10px"
-                    android:gravity="center"
-                    android:text="标记"
-                    android:textColor="@color/topbar_text"
-                    android:textSize="22px"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="50px"
-                    android:drawableLeft="@mipmap/activity_main_topbar_four_unselect"
-                    android:drawablePadding="10px"
-                    android:gravity="center"
-                    android:text="定位标记"
-                    android:textColor="@color/topbar_text"
-                    android:textSize="22px"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="50px"
-                    android:drawableLeft="@mipmap/activity_main_topbar_five_unselect"
-                    android:drawablePadding="10px"
-                    android:gravity="center"
-                    android:text="定位不同"
-                    android:textColor="@color/topbar_text"
-                    android:textSize="22px"
-                    android:textStyle="bold"/>
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="85px"
+                    android:clipToPadding="false"
+                    >
+                </android.support.v7.widget.RecyclerView>
 
             </LinearLayout>
 
-            <View
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="1px"
-                android:background="#B5B5B5"
-                />
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-            <com.chong.widget.verticalviewpager.DummyViewPager
-                android:id="@+id/vertical_viewpager"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="80px"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_curr_page_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="40px"
+                        android:textColor="#404040"
+                        android:textSize="30px"
+                        android:textStyle="bold"/>
+
+                    <View
+                        android:layout_width="wrap_content"
+                        android:layout_height="1px"
+                        android:layout_weight="1"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="50px"
+                        android:drawableLeft="@mipmap/activity_main_topbar_one_unselect"
+                        android:drawablePadding="10px"
+                        android:gravity="center"
+                        android:text="总成绩单"
+                        android:textColor="@color/topbar_text"
+                        android:textSize="22px"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/upload"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="50px"
+                        android:drawableLeft="@mipmap/activity_main_topbar_two_unselect"
+                        android:drawablePadding="10px"
+                        android:gravity="center"
+                        android:text="上传"
+                        android:textColor="@color/topbar_text"
+                        android:textSize="22px"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="50px"
+                        android:drawableLeft="@mipmap/activity_main_topbar_three_unselect"
+                        android:drawablePadding="10px"
+                        android:gravity="center"
+                        android:text="标记"
+                        android:textColor="@color/topbar_text"
+                        android:textSize="22px"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="50px"
+                        android:drawableLeft="@mipmap/activity_main_topbar_four_unselect"
+                        android:drawablePadding="10px"
+                        android:gravity="center"
+                        android:text="定位标记"
+                        android:textColor="@color/topbar_text"
+                        android:textSize="22px"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="50px"
+                        android:drawableLeft="@mipmap/activity_main_topbar_five_unselect"
+                        android:drawablePadding="10px"
+                        android:gravity="center"
+                        android:text="定位不同"
+                        android:textColor="@color/topbar_text"
+                        android:textSize="22px"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="#B5B5B5"
+                    />
+
+                <com.chong.widget.verticalviewpager.DummyViewPager
+                    android:id="@+id/vertical_viewpager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="500px"
+            android:layout_height="500px"
+            android:layout_gravity="right|bottom"
+            android:background="#000000"
+            android:fillViewport="true"
+            android:visibility="gone">
 
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="500px"
-        android:layout_height="500px"
-        android:layout_gravity="right|bottom"
-        android:background="#000000"
-        android:visibility="gone"
-        android:fillViewport="true">
+            <LinearLayout
+                android:id="@+id/logLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/logLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            </LinearLayout>
+        </android.support.v4.widget.NestedScrollView>
 
-        </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
-
-</FrameLayout>
+    </FrameLayout>
+</com.ysxsoft.gkpf.view.MultipleStatusView>
