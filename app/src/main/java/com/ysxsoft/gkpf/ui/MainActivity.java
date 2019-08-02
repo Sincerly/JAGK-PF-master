@@ -128,7 +128,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
      * @return
      */
     private String initList(String json) {
-        String missionId = "";//missionId
+        String missionId = this.missionId;//missionId
         if (taskList == null) {
             taskList = new ArrayList<>();
         }
@@ -565,8 +565,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             case MSG_MANUALSCORE_TASKLISTSTATE_NOTIFY:
                 //任务状态变化通知
                 Log.e("tag", "任务状态变化通知");
-                String missionid = initList(json);
-                ApiManager.confirmTaskState(missionid);
+                missionId = initList(json);
+                ApiManager.confirmTaskState(missionId);
                 break;
             case MSG_MANUALSCORE_ASK_NOTIFY:
                 //问询通知

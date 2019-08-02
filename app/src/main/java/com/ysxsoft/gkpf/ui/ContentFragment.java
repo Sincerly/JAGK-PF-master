@@ -213,7 +213,11 @@ public class ContentFragment extends Fragment {
                                 TextView textView = itemBase.findViewById(R.id.tv_activity_main_right_content);
                                 textView.setVisibility(View.VISIBLE);
                                 //属性
-                                textView.setText(tempCell.getValue().toString());
+                                if (tempCell.getValue().toString().equals("PlayerNumber")) {
+                                    textView.setText(ShareUtils.getUserName());
+                                } else {
+                                    textView.setText(tempCell.getValue().toString());
+                                }
                                 textView.setGravity(tempCell.getAlign());
                                 textView.setTextColor(tempCell.getFontColor());
                                 textView.setTag(tempCell);
@@ -324,10 +328,10 @@ public class ContentFragment extends Fragment {
             pfZjTv.setText(pfZjCell.getValue().toString());
             dfZjTv.setText(dfZjCell.getValue().toString());
 
-            if(pfZjCell.getValue().toString().equals(dfZjCell.getValue().toString())){
-                setTextColor(dfZjTv,true);
-            }else {
-                setTextColor(dfZjTv,false);
+            if (pfZjCell.getValue().toString().equals(dfZjCell.getValue().toString())) {
+                setTextColor(dfZjTv, true);
+            } else {
+                setTextColor(dfZjTv, false);
             }
 
         }
@@ -670,7 +674,7 @@ public class ContentFragment extends Fragment {
      * 请求缓存返回
      */
     public void responseCache(List<CacheResponse> cacheResponseList) {
-        /*if (cacheResponseList == null) {
+        if (cacheResponseList == null) {
             cacheResponseList = new ArrayList<>();
         }
         List<CacheResponse> finalCacheResponseList = cacheResponseList;
@@ -679,34 +683,39 @@ public class ContentFragment extends Fragment {
             public void run() {
                 super.run();
                 if (finalCacheResponseList.size() > 0) {
-                    for (int i = xuHaoView.getRow()+1; i < huiZongView.getRow(); i++) {
+                    for (int i = xuHaoView.getRow() + 1; i < huiZongView.getRow(); i++) {
                         TextView tempTv = deFenViews.get("" + i);
                         if (tempTv != null) {
+                            if (((MyCell) tempTv.getTag()).getValue().toString().equals("--")) {
+                                continue;
+                            }
                             int currIndex = 0;
                             Iterator<Map.Entry<String, TextView>> iterator = peiFenViews.entrySet().iterator();
                             while (iterator.hasNext()) {
                                 Map.Entry<String, TextView> entry = iterator.next();
                                 MyCell pfCell = (MyCell) entry.getValue().getTag();
-                                if (((MyCell)tempTv.getTag()).getRow() > pfCell.getRow() && (!pfCell.getValue().toString().equals("--"))) {
+                                if (((MyCell) tempTv.getTag()).getRow() > pfCell.getRow() && (!pfCell.getValue().toString().equals("--"))) {
                                     currIndex++;
                                 }
                             }
-                            Logutils.e("currentIndex:"+currIndex+" listSize:"+finalCacheResponseList.size());
-                            CacheResponse tempCache = finalCacheResponseList.get(currIndex);
-                            if (tempCache != null) {
-                                if (tempCache.isConfirmed()) {
-                                    getActivity().runOnUiThread(() -> {
-                                        MyCell tempCell = (MyCell) tempTv.getTag();
-                                        tempCell.setValue(tempCache.getScore());
-                                        tempTv.setText("" + tempCache.getScore().toString());
-                                    });
+                            Logutils.e("-------->" + currIndex + "------>" + finalCacheResponseList.size());
+                            if (currIndex < finalCacheResponseList.size()) {
+                                CacheResponse tempCache = finalCacheResponseList.get(currIndex);
+                                if (tempCache != null) {
+                                    if (tempCache.isConfirmed()) {
+                                        getActivity().runOnUiThread(() -> {
+                                            MyCell tempCell = (MyCell) tempTv.getTag();
+                                            tempCell.setValue(tempCache.getScore());
+                                            tempTv.setText("" + tempCache.getScore().toString());
+                                        });
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }.start();*/
+        }.start();
     }
 
 }
