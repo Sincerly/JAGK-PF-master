@@ -63,7 +63,7 @@ public class JxlExcelReadUtils {
                                     myCell.setCellWidth((sheet.getColumnWidth(cellNum) * 1772 / tableWidth)); //单元格宽度
                                     myCell.setReginCol(getMergerCellRegionCol(sheet, rowNum, cellNum));// 合并的列（solspan）
                                     myCell.setReginRow(getMergerCellRegionRow(sheet, rowNum, cellNum));// 合并的行（rowspan）
-                                    myCell.setBgColor(ExcelUtils.getBackgroundColor(context,cell));     //背景颜色
+                                    myCell.setBgColor(ExcelUtils.getBackgroundColor(context, cell));     //背景颜色
                                     myCell.setFontColor(ExcelUtils.getTextColor(context, cell)); //字体颜色
                                     myCell.setAlign(ExcelUtils.getAlign(cell));
 //                                    myCell.setFontBold(boldWeight); //字体加粗
@@ -99,9 +99,12 @@ public class JxlExcelReadUtils {
      * @throws IOException
      */
     private static InputStream getInputStream(Context context, String fileName) throws IOException {
+        if (!fileName.endsWith(".xls") || !fileName.endsWith(".xlsx")) {
+            fileName = fileName + ".xls";
+        }
         InputStream is;
 //        is = context.getAssets().open(fileName);    //从assets获取
-            is = new FileInputStream(AppConfig.BASE_PATH+"/"+fileName);
+        is = new FileInputStream(AppConfig.BASE_PATH + "/" + fileName);
         return is;
     }
 

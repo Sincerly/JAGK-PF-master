@@ -1,14 +1,18 @@
 package com.ysxsoft.gkpf.ui;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.AbsoluteLayout;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -28,7 +32,6 @@ import com.ysxsoft.gkpf.bean.response.FileResponse;
 import com.ysxsoft.gkpf.bean.response.LogoutResponse;
 import com.ysxsoft.gkpf.bean.response.ScoreNotifyResponse;
 import com.ysxsoft.gkpf.bean.response.TaskListResponse;
-import com.ysxsoft.gkpf.bean.response.UploadResponse;
 import com.ysxsoft.gkpf.config.AppConfig;
 import com.ysxsoft.gkpf.ui.adapter.ContentFragmentAdapter;
 import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
@@ -36,20 +39,21 @@ import com.ysxsoft.gkpf.ui.adapter.LeftPopupAdapter;
 import com.ysxsoft.gkpf.utils.FileUtils;
 import com.ysxsoft.gkpf.utils.JsonUtils;
 import com.ysxsoft.gkpf.utils.ShareUtils;
-import com.ysxsoft.gkpf.utils.ToastUtils;
 import com.ysxsoft.gkpf.view.MainLeftPopupView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.LinkedHashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -76,6 +80,10 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     DummyViewPager verticalViewpager;
     @BindView(R.id.upload)
     TextView upload;
+    @BindView(R.id.logLayout)
+    LinearLayout logLayout;
+    @BindView(R.id.scrollView)
+    NestedScrollView scrollView;
 
     private LeftAdapter leftAdapter;
     private LeftPopupAdapter leftPopupAdapter;
@@ -95,7 +103,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         MessageCallbackMap.reg("Main", this);
 //        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
-//        initList("");
+        initList("");
 //        initCache("");
     }
 
@@ -142,6 +150,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             Log.e("tag", "json:" + new Gson().toJson(taskList));
         } catch (JSONException e) {
             e.printStackTrace();
+            writeLog(e.getMessage(), 2);
         }
         //初始化ViewPager
         initLeftData();
@@ -341,7 +350,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 break;
             case R.id.upload:
                 //上传接口
-                upload();
+//                upload();
                 break;
         }
     }
@@ -356,6 +365,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
      */
     @Override
     public void onMessageResponse(short type, String json, byte[] rawData) {
+        writeLog(MessageSender.parsePacketType(type) + ":" + json, 1);
         switch (type) {
             case MSG_MANUALSCORE_LOGINOUT_REPLY:
                 //登出反馈
@@ -423,7 +433,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 //问询通知
                 Log.e("tag", "问询通知");
                 AskResponse uploadResponse = JsonUtils.parseByGson(json, AskResponse.class);
-                if(uploadResponse!=null){
+                if (uploadResponse != null) {
                     String flowName = uploadResponse.getFlowName();
                     ApiManager.confirmAsk(flowName);
                 }
@@ -471,4 +481,38 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 break;
         }
     }
+
+    public void writeLog(final String strLog, final int nType) {
+        Log.e("tag", (nType == 0 ? "发送" : (nType == 2) ? "解析异常" : "接收") + strLog);
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                TextView logTextView = null;
+                if (nType == 0) {
+                    //发送的数据
+                    logTextView = createTextView("SEND>>:" + strLog, Color.WHITE);
+                } else {
+                    //接收到的数据
+                    logTextView = createTextView("RECEIVED>>:" + strLog, Color.RED);
+                }
+                if (logLayout.getChildCount() > 50) {
+                    logLayout.removeAllViews();
+                }
+                logLayout.addView(logTextView);
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
+    }
+
+    public TextView createTextView(String str, int textColor) {
+        TextView textView = new TextView(this);
+        textView.setText(new SimpleDateFormat("yyyy-MM-dd HH:hh:ss:sss").format(new Date()) + " " + str);
+        textView.setTextColor(textColor);
+        textView.setTextSize(15);
+        textView.setPadding(8, 0, 8, 0);
+        textView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        return textView;
+    }
+
+
 }
