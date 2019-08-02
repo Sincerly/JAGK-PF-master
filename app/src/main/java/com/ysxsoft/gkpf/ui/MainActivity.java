@@ -114,7 +114,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         MessageCallbackMap.reg("Main", this);
 //        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
-        initList("");
+        //initList("");
 //        initCache("");
     }
 
@@ -233,6 +233,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             }
             //拿到缓存page列表
             Log.e("tag", "cacheList:" + new Gson().toJson(cacheResponses));
+            Log.e("tag", "cacheBeanMap:" + new Gson().toJson(cachePageBeanMap));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -252,15 +253,17 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         if (data.size() < size) {
             //向集合追加空
             d = new ArrayList<>(size);
-            for (int i = 0; i < data.size(); i++) {
-                CacheResponse response = data.get(i);
-                d.add(response);
-            }
-            for (int i = data.size(); i < d.size(); i++) {
-                CacheResponse response = new CacheResponse();
-                response.setScore(0);
-                response.setConfirmed(false);
-                d.add(response);
+            for (int i = 0; i < size; i++) {
+                if(i<data.size()){
+                    //小于追加进去
+                    CacheResponse response = data.get(i);
+                    d.add(response);
+                }else{
+                    CacheResponse response = new CacheResponse();
+                    response.setScore(0);
+                    response.setConfirmed(false);
+                    d.add(response);
+                }
             }
         } else {
             d = new ArrayList<>(size);
@@ -357,8 +360,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
      * fragment单项上传
      */
     public void uploadByPosition(String fileName, int p, Object object, boolean isConfirm) {
-        Logutils.e("单项上传："+ fileName);
-        p = 0;
+        Logutils.e("单项上传："+ fileName+"p");
         if (cacheResponses != null) {
             List<CacheResponse> list = cacheResponses.get(fileName);
             if (list == null) {
