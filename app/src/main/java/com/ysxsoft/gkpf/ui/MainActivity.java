@@ -211,7 +211,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             Iterator<String> iterator = key.iterator();
             while (iterator.hasNext()) {
                 String fileName = iterator.next();
-                //拿到缓存的值
+                //拿到缓存的页面值
                 CacheBean cacheBean = cachePageBeanMap.get(fileName);
                 int size=0;
                 if(cacheBean!=null){
@@ -229,7 +229,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     }
 
     /**
-     * 创建空列表
+     * 创建同size大小的list
      *
      * @param data
      * @return
@@ -254,11 +254,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             }
         } else {
             //后台返回比前台多1个
-            for (int i = 0; i <data.size(); i++) {
-                try {
-                    d.add(data.get(i));
-                }catch (Exception e) {
-                }
+            for (int i = 0; i <size; i++) {
+                 d.add(data.get(i));
             }
         }
         return d;
