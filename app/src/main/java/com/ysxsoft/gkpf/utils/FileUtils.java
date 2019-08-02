@@ -41,6 +41,9 @@ public class FileUtils {
                 dir.mkdirs();
             }
             file = new File(filePath + File.separator + fileName);
+            if(file.exists()){
+                file.delete();
+            }
             fos = new FileOutputStream(file);
             bos = new BufferedOutputStream(fos);
             bos.write(buf);
