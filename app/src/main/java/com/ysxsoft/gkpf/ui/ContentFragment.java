@@ -364,7 +364,7 @@ public class ContentFragment extends Fragment {
                 currRowDfText.setText("" + tempValue);
             }
         }
-
+        setTextColor(currRowDfText, true);
     }
 
     /**
@@ -406,6 +406,7 @@ public class ContentFragment extends Fragment {
             dfCell.setValue(0);
             currRowDfText.setText("0");
         }
+        setTextColor(currRowDfText, false);
     }
 
     /**
@@ -438,8 +439,10 @@ public class ContentFragment extends Fragment {
                 if (myCellValue.length > 0 && myCellValue.length == 1) {
                     if (type == 1) {
                         currRowDfText.setText(pingfenJia(pfCell, dfCell, myCellValue[0]));
+                        setTextColor(currRowDfText, !IsUnable(pfCell, dfCell, type));
                     } else {
                         currRowDfText.setText(pingfenJian(pfCell, dfCell, myCellValue[0]));
+                        setTextColor(currRowDfText, false);
                     }
                 } else {
                     //如果有多个扣分分值，点击加号或减号，在本图标下弹出下拉列表，进行分数选择
@@ -450,8 +453,10 @@ public class ContentFragment extends Fragment {
                                 public void resultValue(String value) {
                                     if (type == 1) {
                                         currRowDfText.setText(pingfenJia(pfCell, dfCell, value));
+                                        setTextColor(currRowDfText, !IsUnable(pfCell, dfCell, type));
                                     } else {
                                         currRowDfText.setText(pingfenJian(pfCell, dfCell, value));
+                                        setTextColor(currRowDfText, false);
                                     }
                                 }
                             }))
@@ -595,10 +600,13 @@ public class ContentFragment extends Fragment {
         }
     }
 
-    public void sendRefresh(MyCell myCell, boolean isConfirm) {
-
-    }
-
+    /**
+     * 实时同步到服务器评分结果
+     *
+     * @param currRow
+     * @param object
+     * @param isConfirm
+     */
     public void refreshMain(int currRow, Object object, boolean isConfirm) {
         //实时更新数据
         int currIndex = currRow - xuHaoView.getRow() - 1;
@@ -655,4 +663,5 @@ public class ContentFragment extends Fragment {
         }
 
     }
+
 }
