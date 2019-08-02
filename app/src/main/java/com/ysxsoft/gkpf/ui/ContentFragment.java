@@ -620,22 +620,9 @@ public class ContentFragment extends Fragment {
         Iterator<Map.Entry<String, TextView>> iterator = peiFenViews.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, TextView> entry = iterator.next();
-            MyCell pfCell = (MyCell) peiFenViews.get(entry.getKey()).getTag();
-            if (currRow < pfCell.getRow()) {
+            MyCell pfCell = (MyCell) entry.getValue().getTag();
+            if (currRow > pfCell.getRow()&& (!pfCell.getValue().toString().equals("--"))) {
                 currIndex++;
-            } else {
-                break;
-            }
-        }
-
-        Iterator<Map.Entry<String, TextView>> noPfViewsIterator = noPfViews.entrySet().iterator();
-        while (noPfViewsIterator.hasNext()) {
-            Map.Entry<String, TextView> entry = noPfViewsIterator.next();
-            MyCell noPFCell = (MyCell) noPfViews.get(entry.getKey()).getTag();
-            if (currRow > noPFCell.getRow()) {
-                currIndex--;
-            } else {
-                break;
             }
         }
         //传给主页，更新服务器数据
