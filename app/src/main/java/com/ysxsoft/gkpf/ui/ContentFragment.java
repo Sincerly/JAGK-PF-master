@@ -355,18 +355,18 @@ public class ContentFragment extends Fragment {
         //负数，做对了，得0分，做错了，得负分
         if (tempValue < 0) {
             //实时同步服务器缓存数据
-            refreshMain(myCell.getRow(), 0, !isEmpty(dfCell.getValue().toString()));
+            refreshMain(myCell.getRow(), 0);
             dfCell.setValue(0);
             currRowDfText.setText("0");
         } else {
             if (tempValue == (int) tempValue) {
                 //实时同步服务器缓存数据
-                refreshMain(myCell.getRow(), (int) tempValue, !isEmpty(dfCell.getValue().toString()));
+                refreshMain(myCell.getRow(), (int) tempValue);
                 dfCell.setValue((int) tempValue);
                 currRowDfText.setText("" + ((int) tempValue));
             } else {
                 //实时同步服务器缓存数据
-                refreshMain(myCell.getRow(), tempValue, !isEmpty(dfCell.getValue().toString()));
+                refreshMain(myCell.getRow(), tempValue);
                 dfCell.setValue(tempValue);
                 currRowDfText.setText("" + tempValue);
             }
@@ -398,18 +398,18 @@ public class ContentFragment extends Fragment {
         if (tempValue < 0) {
             if (tempValue == (int) tempValue) {
                 //实时同步服务器缓存数据
-                refreshMain(myCell.getRow(), (int) tempValue, !isEmpty(dfCell.getValue().toString()));
+                refreshMain(myCell.getRow(), (int) tempValue);
                 dfCell.setValue((int) tempValue);
                 currRowDfText.setText("" + ((int) tempValue));
             } else {
                 //实时同步服务器缓存数据
-                refreshMain(myCell.getRow(), tempValue, !isEmpty(dfCell.getValue().toString()));
+                refreshMain(myCell.getRow(), tempValue);
                 dfCell.setValue(tempValue);
                 currRowDfText.setText("" + tempValue);
             }
         } else {
             //实时同步服务器缓存数据
-            refreshMain(myCell.getRow(), 0, !isEmpty(dfCell.getValue().toString()));
+            refreshMain(myCell.getRow(), 0);
             dfCell.setValue(0);
             currRowDfText.setText("0");
         }
@@ -543,12 +543,12 @@ public class ContentFragment extends Fragment {
         showToast("+" + value);
         if (tempValue == (int) tempValue) {
             //实时同步服务器缓存数据
-            refreshMain(dfCell.getRow(), (int) tempValue, !isEmpty(dfCell.getValue().toString()));
+            refreshMain(dfCell.getRow(), (int) tempValue);
             dfCell.setValue((int) tempValue);
             return ("" + ((int) tempValue));
         } else {
             //实时同步服务器缓存数据
-            refreshMain(dfCell.getRow(), tempValue, !isEmpty(dfCell.getValue().toString()));
+            refreshMain(dfCell.getRow(), tempValue);
             dfCell.setValue(tempValue);
             return ("" + tempValue);
         }
@@ -583,12 +583,12 @@ public class ContentFragment extends Fragment {
         showToast("-" + value);
         if (tempValue == (int) tempValue) {
             //实时同步服务器缓存数据
-            refreshMain(dfCell.getRow(), (int) tempValue, !isEmpty(dfCell.getValue().toString()));
+            refreshMain(dfCell.getRow(), (int) tempValue);
             dfCell.setValue((int) tempValue);
             return ("" + ((int) tempValue));
         } else {
             //实时同步服务器缓存数据
-            refreshMain(dfCell.getRow(), tempValue, !isEmpty(dfCell.getValue().toString()));
+            refreshMain(dfCell.getRow(), tempValue);
             dfCell.setValue(tempValue);
             return ("" + tempValue);
         }
@@ -612,9 +612,8 @@ public class ContentFragment extends Fragment {
      *
      * @param currRow
      * @param object
-     * @param isConfirm
      */
-    public void refreshMain(int currRow, Object object, boolean isConfirm) {
+    public void refreshMain(int currRow, Object object) {
         //实时更新数据
         int currIndex = 0;
         Iterator<Map.Entry<String, TextView>> iterator = peiFenViews.entrySet().iterator();
@@ -627,7 +626,7 @@ public class ContentFragment extends Fragment {
         }
         //传给主页，更新服务器数据
         MainActivity activity = (MainActivity) getActivity();
-        activity.uploadByPosition(getFileName(), currIndex, object, isConfirm);
+        activity.uploadByPosition(getFileName(), currIndex, object, true);
     }
 
     @Override
