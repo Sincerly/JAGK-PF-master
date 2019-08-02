@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import com.ysxsoft.gkpf.bean.MyCell;
 import com.ysxsoft.gkpf.bean.response.CacheResponse;
 import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
 import com.ysxsoft.gkpf.utils.JxlExcelReadUtils;
+import com.ysxsoft.gkpf.utils.Logutils;
 import com.ysxsoft.gkpf.utils.ShareUtils;
 import com.ysxsoft.gkpf.utils.SystemUtils;
 import com.ysxsoft.gkpf.view.PingFenPopupView;
@@ -251,6 +253,10 @@ public class ContentFragment extends Fragment {
                                 tv_button.setVisibility(View.VISIBLE);
                                 tv_button.setTag(tempCell);
                                 tv_button.setOnClickListener(new HuiZongClickListener());
+
+                                //请求缓存
+                                int size = peiFenViews.size()-noPfViews.size();
+                                requestCache(size);
                             }
                             baseView.addView(itemBase);
                         }
@@ -262,6 +268,7 @@ public class ContentFragment extends Fragment {
             e.printStackTrace();
             showToast("文件解析异常");
         }
+
     }
 
     @Override
@@ -650,6 +657,7 @@ public class ContentFragment extends Fragment {
      * 请求缓存
      */
     public void requestCache(int size){
+        Logutils.e(getPosition()+"请求行数:"+size);
         MainActivity activity = (MainActivity) getActivity();
         activity.requestCache(getPosition(), getFileName(), size);
     }

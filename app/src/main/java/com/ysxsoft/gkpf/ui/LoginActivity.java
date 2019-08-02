@@ -218,6 +218,9 @@ public class LoginActivity extends BaseActivity implements IMessageCallback {
         @Override
         public void afterTextChanged(Editable s) {
             View currView = getCurrentFocus();
+            if(currView==null){
+                return;
+            }
             if (currView.getId() == etActivityLoginName.getId()) {
                 if (etActivityLoginName.getText().toString().length() > 0) {
                     ivActivityLoginNameDel.setVisibility(View.VISIBLE);
