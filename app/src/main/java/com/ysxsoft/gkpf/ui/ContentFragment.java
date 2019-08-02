@@ -20,6 +20,7 @@ import com.lxj.xpopup.XPopup;
 import com.lxj.xpopup.enums.PopupPosition;
 import com.ysxsoft.gkpf.R;
 import com.ysxsoft.gkpf.bean.MyCell;
+import com.ysxsoft.gkpf.bean.response.CacheResponse;
 import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
 import com.ysxsoft.gkpf.utils.JxlExcelReadUtils;
 import com.ysxsoft.gkpf.utils.PoiExcelReadUtils;
@@ -31,6 +32,7 @@ import com.ysxsoft.gkpf.view.PingFenPopupView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.OnClick;
@@ -607,4 +609,21 @@ public class ContentFragment extends Fragment {
         ((BaseActivity) getActivity()).showToast(text);
     }
 
+    /**
+     * 请求缓存
+     */
+    public void requestCache(int size){
+        MainActivity activity = (MainActivity) getActivity();
+        activity.requestCache(getPosition(), getFileName(), size);
+    }
+
+    /**
+     * 请求缓存返回
+     */
+    public void responseCache(List<CacheResponse> cacheResponseList){
+        if(cacheResponseList==null){
+            cacheResponseList=new ArrayList<>();
+        }
+
+    }
 }

@@ -25,6 +25,7 @@ import com.ysxsoft.gkpf.api.ApiManager;
 import com.ysxsoft.gkpf.api.IMessageCallback;
 import com.ysxsoft.gkpf.api.MessageCallbackMap;
 import com.ysxsoft.gkpf.api.MessageSender;
+import com.ysxsoft.gkpf.bean.CacheBean;
 import com.ysxsoft.gkpf.bean.request.UploadScoreRequest;
 import com.ysxsoft.gkpf.bean.response.AskResponse;
 import com.ysxsoft.gkpf.bean.response.CacheResponse;
@@ -47,6 +48,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -92,6 +94,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     //List<CacheResponse.DataBean> cacheResponses;
     Map<String, List<CacheResponse>> cacheResponses;
     private String missionId = "";//TODO:考试ID
+
+    ContentFragmentAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,11 +199,108 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                     cacheResponses.put(key, list);//放进map
                 }
             }
+            //拿到缓存列表
+            Set<String> key = cacheResponses.keySet();
+            Iterator<String> iterator = key.iterator();
+            while (iterator.hasNext()) {
+                String fileName = iterator.next();
+                //拿到缓存的值
+                CacheBean cacheBean = cachePageBeanMap.get(fileName);
+                int size=0;
+                if(cacheBean!=null){
+                     size = cacheBean.getSize();//缓存数量
+                }
+                List<CacheResponse> responses =createEmptyList(cacheResponses.get(fileName),size);
+                cacheResponses.put(fileName,responses);//替换追加空的map
+                updatePageCache(fileName);//刷新页面
+            }
+            //拿到缓存page列表
             Log.e("tag", "cacheList:" + new Gson().toJson(cacheResponses));
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 创建空列表
+     *
+     * @param data
+     * @return
+     */
+    private List<CacheResponse> createEmptyList(List<CacheResponse> data, int size) {
+        if (data == null) {
+            data = new ArrayList<>();
+        }
+        List<CacheResponse> d=null;
+        if (data.size() < size) {
+            //向集合追加空
+            d = new ArrayList<>(size);
+            for (int i = 0; i < data.size(); i++) {
+                CacheResponse response = data.get(i);
+                d.add(response);
+            }
+            for (int i = data.size(); i < d.size(); i++) {
+                CacheResponse response = new CacheResponse();
+                response.setScore(0);
+                response.setConfirmed(false);
+                d.add(response);
+            }
+        } else {
+            //后台返回比前台多1个
+            for (int i = 0; i <data.size(); i++) {
+                try {
+                    d.add(data.get(i));
+                }catch (Exception e) {
+                }
+            }
+        }
+        return d;
+    }
+
+    public void updatePageCache(String fileName) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (verticalViewpager != null) {
+                    CacheBean cacheBean = cachePageBeanMap.get(fileName);
+                    int position = cacheBean.getPosition();//缓存页面下表标
+                    ContentFragment contentFragment = (ContentFragment) adapter.getItem(position);
+                    if (cacheResponses != null && cacheResponses.containsKey(fileName)) {
+                        contentFragment.responseCache(cacheResponses.get(fileName));
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * 请求缓存
+     *
+     * @param position 页面下标
+     * @param fileName 页面文件名
+     * @param size     页面行数
+     */
+    public void requestCache(int position, String fileName, int size) {
+        if (cachePageBeanMap == null) {
+            cachePageBeanMap = new HashMap<>();
+        }
+        if (cachePageBeanMap.containsKey(fileName)) {
+            CacheBean cacheBean = cachePageBeanMap.get(fileName);
+            cacheBean.setFileName(fileName);
+            cacheBean.setPosition(position);
+            cacheBean.setSize(size);
+        } else {
+            CacheBean cacheBean = new CacheBean();
+            cacheBean.setFileName(fileName);
+            cacheBean.setPosition(position);
+            cacheBean.setSize(size);
+            cachePageBeanMap.put(fileName, cacheBean);
+        }
+        ApiManager.cache();
+    }
+
+    private Map<String, CacheBean> cachePageBeanMap = new HashMap<>();//文件名为key 封装页面信息
+
 
     /**
      * 上传分数
@@ -314,7 +415,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         for (int i = 0; i < taskList.size(); i++) {
             holder.add(ContentFragment.newInstance(taskList.get(i).getFlowName(), i, verticalViewpager));
         }
-        verticalViewpager.setAdapter(holder.set());
+        adapter = holder.set();
+        verticalViewpager.setAdapter(adapter);
         //If you setting other scroll mode, the scrolled fade is shown from either side of display.
         verticalViewpager.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
         verticalViewpager.setOffscreenPageLimit(taskList.size());
