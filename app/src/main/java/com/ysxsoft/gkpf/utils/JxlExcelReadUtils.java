@@ -99,7 +99,7 @@ public class JxlExcelReadUtils {
      * @throws IOException
      */
     private static InputStream getInputStream(Context context, String fileName) throws IOException {
-        if (!fileName.endsWith(".xls") || !fileName.endsWith(".xlsx")) {
+        if (!fileName.endsWith(".xls")) {
             fileName = fileName + ".xls";
         }
         InputStream is;

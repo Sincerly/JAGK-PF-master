@@ -59,12 +59,8 @@ public class MainLeftPopupView extends DrawerPopupView {
         TextView tv_exit = findViewById(R.id.tv_exit);
         tv_exit.setOnClickListener(v -> {
             new XPopup.Builder(context)
-                    .dismissOnTouchOutside(false) // 点击外部是否关闭弹窗，默认为true
-                    .asCustom(new AlertPopupView(context).setTitle("温馨提醒").setMsg("确定要退出登录吗？").setOnSubmitClickListener(new OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            ApiManager.logout();//退出登录
-                        }
+                    .asCustom(new AlertPopupView(context).setTitle("温馨提醒").setMsg("确定要退出登录吗？").setOnSubmitClickListener(v1 -> {
+                        ApiManager.logout();//退出登录
                     }))
                     .show();
         });

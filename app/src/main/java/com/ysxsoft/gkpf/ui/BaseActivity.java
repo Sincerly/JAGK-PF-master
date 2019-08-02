@@ -47,7 +47,7 @@ public class BaseActivity extends AutoLayoutActivity {
      * 吐司
      */
     protected void showToast(String text) {
-        runOnUiThread(() -> ToastUtils.showToast(BaseActivity.this, text, 0));
+        runOnUiThread(() -> ToastUtils.showToast(text, 0));
     }
 
     /**

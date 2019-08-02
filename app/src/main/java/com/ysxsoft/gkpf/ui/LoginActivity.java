@@ -27,8 +27,6 @@ import com.ysxsoft.gkpf.bean.response.LoginResponse;
 import com.ysxsoft.gkpf.config.AppConfig;
 import com.ysxsoft.gkpf.utils.JsonUtils;
 import com.ysxsoft.gkpf.utils.ShareUtils;
-import com.ysxsoft.gkpf.utils.ToastUtils;
-import com.ysxsoft.gkpf.view.AlertPopupView;
 import com.ysxsoft.gkpf.view.MultipleStatusView;
 import com.ysxsoft.gkpf.view.SetupPopupView;
 
@@ -118,7 +116,7 @@ public class LoginActivity extends BaseActivity implements IMessageCallback {
                     MessageSender.connect(ShareUtils.getHost(), Integer.parseInt(ShareUtils.getPort()));
                     handler.sendEmptyMessageDelayed(0x01,300);
                 } else {
-                    ToastUtils.showToast(LoginActivity.this, "请检查配置！", 300);
+                    showToast("请检查配置！");
                 }
                 break;
         }
@@ -146,23 +144,21 @@ public class LoginActivity extends BaseActivity implements IMessageCallback {
         switch (type) {
             case ApiManager.MSG_MANUALSCORE_LOGIN_REPLY:
                 //登录回馈
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        LoginResponse response = JsonUtils.parseByGson(json, LoginResponse.class);
-                        if (response != null && response.isResult()) {
-                            //登录成功
-                            ShareUtils.setUserType(String.valueOf(response.getUserType()));
-                            ShareUtils.setUserName(response.getUserName());
-                            ShareUtils.setUserPwd(response.getPassword());
-                            multipleStatusView.hideLoading();
-                            showToast("登陆成功！");
-                            startActivity(MainActivity.class);
-                            finish();
-                        } else {
-                            //登录失败
-                            showToast("登陆失败！");
-                        }
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    LoginResponse response = JsonUtils.parseByGson(json, LoginResponse.class);
+                    if (response != null && response.isResult()) {
+                        //登录成功
+                        ShareUtils.setUserType(String.valueOf(response.getUserType()));
+                        ShareUtils.setUserName(response.getUserName());
+                        ShareUtils.setUserPwd(response.getPassword());
+                        multipleStatusView.hideLoading();
+                        showToast("登陆成功！");
+                        startActivity(MainActivity.class);
+                        finish();
+                    } else {
+                        //登录失败
+                        multipleStatusView.hideLoading();
+                        showToast("登陆失败！");
                     }
                 });
                 break;

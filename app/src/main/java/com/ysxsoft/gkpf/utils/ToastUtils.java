@@ -9,20 +9,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ysxsoft.gkpf.R;
+import com.ysxsoft.gkpf.YsxApplication;
 
 /**
  * Created by zhaozhipeng on 17/6/27.
  */
 
 public class ToastUtils {
+
+    private static Context context = YsxApplication.getInstance();
+    private static Toast toast;
+
     /**
      *
-     * @param context
      * @param msg
      * @param time  0:short  1:long
      */
-    public static void showToast(Context context, String msg , int time){
-        Toast toast = Toast.makeText(context, msg, time);
+    public static void showToast(String msg , int time){
+        if (toast != null) {
+            toast.cancel();
+        }
+        toast = Toast.makeText(context, msg, time);
         LinearLayout layout = (LinearLayout)toast.getView();
         layout.removeAllViews();
         layout.setOrientation(LinearLayout.HORIZONTAL);

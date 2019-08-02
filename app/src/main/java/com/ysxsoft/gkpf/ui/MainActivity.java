@@ -86,7 +86,10 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     LinearLayout logLayout;
     @BindView(R.id.scrollView)
     NestedScrollView scrollView;
+    @BindView(R.id.tv_curr_page_name)
+    TextView tvCurrPageName;
 
+    private ContentFragmentAdapter fragmentAdapter;
     private LeftAdapter leftAdapter;
     private LeftPopupAdapter leftPopupAdapter;
     private LeftItemClickListener leftItemClick;
@@ -105,7 +108,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         MessageCallbackMap.reg("Main", this);
 //        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
-//        initList("");
+        initList("");
 //        initCache("");
     }
 
@@ -121,7 +124,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             taskList = new ArrayList<>();
         }
         taskList.clear();
-//        json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]},{\"taskName\":\"taskName2\",\"taskState\":2,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]}]}";
+        json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"aaaaaa\",\"aaaaaa.xls\"]},{\"taskName\":\"taskName2\",\"taskState\":2,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]}]}";
         try {
             JSONObject jsonObject = new JSONObject(json);
             String groupId = jsonObject.optString("groupId");
@@ -320,7 +323,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         for (int i = 0; i < taskList.size(); i++) {
             holder.add(ContentFragment.newInstance(taskList.get(i).getFlowName(), i, verticalViewpager));
         }
-        verticalViewpager.setAdapter(holder.set());
+        fragmentAdapter=holder.set();
+        verticalViewpager.setAdapter(fragmentAdapter);
         //If you setting other scroll mode, the scrolled fade is shown from either side of display.
         verticalViewpager.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
         verticalViewpager.setOffscreenPageLimit(taskList.size());
@@ -329,6 +333,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             public void onPageScrolled(int i, float v, int i1) {
                 leftAdapter.setCurrPage(i);
                 leftPopupAdapter.setCurrPage(i);
+                tvCurrPageName.setText(((ContentFragment)fragmentAdapter.getItem(i)).getFileName());
             }
 
             @Override
