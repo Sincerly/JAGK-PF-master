@@ -663,7 +663,7 @@ public class ContentFragment extends Fragment {
      * 请求缓存返回
      */
     public void responseCache(List<CacheResponse> cacheResponseList) {
-        if (cacheResponseList == null) {
+        /*if (cacheResponseList == null) {
             cacheResponseList = new ArrayList<>();
         }
         List<CacheResponse> finalCacheResponseList = cacheResponseList;
@@ -684,6 +684,7 @@ public class ContentFragment extends Fragment {
                                     currIndex++;
                                 }
                             }
+                            Logutils.e("currentIndex:"+currIndex+" listSize:"+finalCacheResponseList.size());
                             CacheResponse tempCache = finalCacheResponseList.get(currIndex);
                             if (tempCache != null) {
                                 if (tempCache.isConfirmed()) {
@@ -698,7 +699,7 @@ public class ContentFragment extends Fragment {
                     }
                 }
             }
-        }.start();
+        }.start();*/
     }
 
 }
