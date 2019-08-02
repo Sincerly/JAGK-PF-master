@@ -253,6 +253,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 d.add(response);
             }
         } else {
+            d=new ArrayList<>(size);
             //后台返回比前台多1个
             for (int i = 0; i <size; i++) {
                  d.add(data.get(i));
