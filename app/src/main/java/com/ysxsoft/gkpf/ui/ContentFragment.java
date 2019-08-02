@@ -323,6 +323,13 @@ public class ContentFragment extends Fragment {
             }
             pfZjTv.setText(pfZjCell.getValue().toString());
             dfZjTv.setText(dfZjCell.getValue().toString());
+
+            if(pfZjCell.getValue().toString().equals(dfZjCell.getValue().toString())){
+                setTextColor(dfZjTv,true);
+            }else {
+                setTextColor(dfZjTv,false);
+            }
+
         }
     }
 
@@ -672,15 +679,15 @@ public class ContentFragment extends Fragment {
             public void run() {
                 super.run();
                 if (finalCacheResponseList.size() > 0) {
-                    for (int i = xuHaoView.getRow(); i < huiZongView.getRow(); i++) {
+                    for (int i = xuHaoView.getRow()+1; i < huiZongView.getRow(); i++) {
                         TextView tempTv = deFenViews.get("" + i);
                         if (tempTv != null) {
-                            Iterator<Map.Entry<String, TextView>> iterator = deFenViews.entrySet().iterator();
                             int currIndex = 0;
+                            Iterator<Map.Entry<String, TextView>> iterator = peiFenViews.entrySet().iterator();
                             while (iterator.hasNext()) {
                                 Map.Entry<String, TextView> entry = iterator.next();
                                 MyCell pfCell = (MyCell) entry.getValue().getTag();
-                                if (((MyCell) tempTv.getTag()).getRow() > pfCell.getRow() && (!pfCell.getValue().toString().equals("--"))) {
+                                if (((MyCell)tempTv.getTag()).getRow() > pfCell.getRow() && (!pfCell.getValue().toString().equals("--"))) {
                                     currIndex++;
                                 }
                             }
