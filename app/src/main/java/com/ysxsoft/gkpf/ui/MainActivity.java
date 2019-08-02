@@ -28,6 +28,7 @@ import com.ysxsoft.gkpf.api.IMessageCallback;
 import com.ysxsoft.gkpf.api.MessageCallbackMap;
 import com.ysxsoft.gkpf.api.MessageSender;
 import com.ysxsoft.gkpf.bean.CacheBean;
+import com.ysxsoft.gkpf.bean.request.CacheRequest;
 import com.ysxsoft.gkpf.bean.request.UploadScoreRequest;
 import com.ysxsoft.gkpf.bean.response.AskResponse;
 import com.ysxsoft.gkpf.bean.response.CacheResponse;
@@ -41,6 +42,7 @@ import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
 import com.ysxsoft.gkpf.ui.adapter.LeftPopupAdapter;
 import com.ysxsoft.gkpf.utils.FileUtils;
 import com.ysxsoft.gkpf.utils.JsonUtils;
+import com.ysxsoft.gkpf.utils.Logutils;
 import com.ysxsoft.gkpf.utils.ShareUtils;
 import com.ysxsoft.gkpf.view.MainLeftPopupView;
 import com.ysxsoft.gkpf.view.MultipleStatusView;
@@ -102,8 +104,6 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     Map<String, List<CacheResponse>> cacheResponses;
     private String missionId = "";//TODO:考试ID
 
-    ContentFragmentAdapter adapter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,7 +130,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             taskList = new ArrayList<>();
         }
         taskList.clear();
-        json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"aaaaaa\",\"aaaaaa.xls\"]},{\"taskName\":\"taskName2\",\"taskState\":2,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]}]}";
+        //\json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"aaaaaa\",\"aaaaaa.xls\"]},{\"taskName\":\"taskName2\",\"taskState\":2,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]}]}";
         try {
             JSONObject jsonObject = new JSONObject(json);
             String groupId = jsonObject.optString("groupId");
@@ -180,10 +180,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     private void initCache(String json) {
         if (cacheResponses == null) {
             cacheResponses = new HashMap<>();
-        } else {
-            cacheResponses.clear();
         }
-        json = "{\"groupId\":\"1\",\"requestId\":1,\"flowName1\":[{\"score\":1.5,\"isConfirmed\":false},{ \"score\":5,\"isConfirmed\":false}],\"flowName2\":[{\"score\":5,\"isConfirmed\":true},{\"score\":5, \"isConfirmed\":false}]}";
+        //json = "{\"groupId\":\"1\",\"requestId\":1,\"flowName1\":[{\"score\":1.5,\"isConfirmed\":false},{ \"score\":5,\"isConfirmed\":false}],\"flowName2\":[{\"score\":5,\"isConfirmed\":true},{\"score\":5, \"isConfirmed\":false}]}";
         try {
             JSONObject jsonObject = new JSONObject(json);
             Iterator<String> keys = jsonObject.keys();
@@ -194,23 +192,27 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 } else if ("requestId".equals(key)) {
                     int requestId = jsonObject.optInt("requestId");
                 } else {
-                    JSONArray array = jsonObject.optJSONArray(key);
-                    List<CacheResponse> list = new ArrayList<>();
-                    for (int i = 0; i < array.length(); i++) {
-                        JSONObject object = array.optJSONObject(i);
-                        Object score = object.get("score");
-                        boolean isConfirmed = (boolean) object.get("isConfirmed");
-                        //返回值封装数据
-                        CacheResponse response = new CacheResponse();
-                        response.setScore(score);
-                        response.setConfirmed(isConfirmed);
-                        list.add(response);
+                    try {
+                        JSONArray array = jsonObject.optJSONArray(key);
+                        List<CacheResponse> list = new ArrayList<>();
+                        for (int i = 0; i < array.length(); i++) {
+                            JSONObject object = array.optJSONObject(i);
+                            Object score = object.get("score");
+                            boolean isConfirmed = (boolean) object.get("isConfirmed");
+                            //返回值封装数据
+                            CacheResponse response = new CacheResponse();
+                            response.setScore(score);
+                            response.setConfirmed(isConfirmed);
+                            list.add(response);
+                        }
+                        cacheResponses.put(key, list);//放进map
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    cacheResponses.put(key, list);//放进map
                 }
             }
             //拿到缓存列表
-            Set<String> key = cacheResponses.keySet();
+            Set<String> key = cachePageBeanMap.keySet();
             Iterator<String> iterator = key.iterator();
             while (iterator.hasNext()) {
                 String fileName = iterator.next();
@@ -220,7 +222,12 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 if (cacheBean != null) {
                     size = cacheBean.getSize();//缓存数量
                 }
-                List<CacheResponse> responses = createEmptyList(cacheResponses.get(fileName), size);
+                List<CacheResponse> responses = null;
+                if (cacheResponses.containsKey(fileName)) {
+                    responses = createEmptyList(cacheResponses.get(fileName), size);
+                } else {
+                    responses = createEmptyList(new ArrayList<>(), size);
+                }
                 cacheResponses.put(fileName, responses);//替换追加空的map
                 updatePageCache(fileName);//刷新页面
             }
@@ -271,8 +278,11 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             public void run() {
                 if (verticalViewpager != null) {
                     CacheBean cacheBean = cachePageBeanMap.get(fileName);
+                    if (cacheBean == null) {
+                        return;
+                    }
                     int position = cacheBean.getPosition();//缓存页面下表标
-                    ContentFragment contentFragment = (ContentFragment) adapter.getItem(position);
+                    ContentFragment contentFragment = (ContentFragment) fragmentAdapter.getItem(position);
                     if (cacheResponses != null && cacheResponses.containsKey(fileName)) {
                         contentFragment.responseCache(cacheResponses.get(fileName));
                     }
@@ -339,7 +349,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             stepMap.put(key, flowName1);
         }
         request.setStepScores(stepMap);
-        System.out.println("data:" + new Gson().toJson(request));
+        Logutils.e("data:" + new Gson().toJson(request));
         ApiManager.uploadScore(request);
     }
 
@@ -347,8 +357,13 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
      * fragment单项上传
      */
     public void uploadByPosition(String fileName, int p, Object object, boolean isConfirm) {
+        Logutils.e("单项上传："+ fileName);
+        p = 0;
         if (cacheResponses != null) {
             List<CacheResponse> list = cacheResponses.get(fileName);
+            if (list == null) {
+                return;
+            }
             boolean isEdited = false;
             for (int i = 0; i < list.size(); i++) {
                 if (i == p) {
@@ -380,17 +395,21 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 } else if ("requestId".equals(key)) {
                     int requestId = jsonObject.optInt("requestId");
                 } else {
-                    LinkedHashMap<String, String> map = new LinkedHashMap();
-                    JSONObject flowObject = jsonObject.getJSONObject(key);
-                    Iterator<String> flowKeyList = flowObject.keys();
-                    while (flowKeyList.hasNext()) {
-                        String flowKey = flowKeyList.next();
-                        String placeHolderStr = flowObject.optString(flowKey);
-                        map.put(flowKey, placeHolderStr);//替换内容
+                    try {
+                        LinkedHashMap<String, String> map = new LinkedHashMap();
+                        JSONObject flowObject = jsonObject.getJSONObject(key);
+                        Iterator<String> flowKeyList = flowObject.keys();
+                        while (flowKeyList.hasNext()) {
+                            String flowKey = flowKeyList.next();
+                            String placeHolderStr = flowObject.optString(flowKey);
+                            map.put(flowKey, placeHolderStr);//替换内容
+                        }
+                        list.add(key);//放进key
+                        replaceMap.put(key, map);
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
-                    list.add(key);//放进key
-                    replaceMap.put(key, map);
-                }
+                 }
             }
             ApiManager.confirmReplace(list);
             Log.e("tag", "replaceList:" + new Gson().toJson(replaceMap));
@@ -453,6 +472,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
             verticalViewpager.setCurrentItem(position, true);
         }
+
     }
 
     @OnClick({R.id.ll_activity_main_left, R.id.upload})
@@ -541,9 +561,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
                 //任务状态变化通知
                 Log.e("tag", "任务状态变化通知");
                 String missionid = initList(json);
-                if (!"".equals(missionid)) {
-                    ApiManager.confirmTaskState(missionid);
-                }
+                ApiManager.confirmTaskState(missionid);
                 break;
             case MSG_MANUALSCORE_ASK_NOTIFY:
                 //问询通知

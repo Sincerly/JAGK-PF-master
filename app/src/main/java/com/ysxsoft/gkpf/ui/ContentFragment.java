@@ -629,6 +629,7 @@ public class ContentFragment extends Fragment {
         }
         //传给主页，更新服务器数据
         MainActivity activity = (MainActivity) getActivity();
+        Logutils.e("当前页面："+currIndex+"fileName:"+getFileName()+" score:"+object+" isConfirm:"+isConfirm);
         activity.uploadByPosition(getFileName(), currIndex, object, isConfirm);
     }
 
