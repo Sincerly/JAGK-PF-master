@@ -1,9 +1,11 @@
 package com.ysxsoft.gkpf.ui;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -154,8 +156,11 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         }
         //初始化ViewPager
         runOnUiThread(() -> {
-            initLeftData();
-            initViewPager();
+            //TODO 重复下发任务状态数据会崩溃，原因待查？
+            if (leftAdapter.getData().size() == 0) {
+                initViewPager();
+                initLeftData();
+            }
         });
         return missionId;
     }
@@ -304,6 +309,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     private void initLeftData() {
         if (taskList != null) {
             leftAdapter.setNewData(taskList);
+            leftPopupAdapter.setNewData(taskList);
         }
     }
 
@@ -518,5 +524,24 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         return textView;
     }
 
+    private boolean isExit = false;
 
+    @SuppressLint("HandlerLeak")
+    @Override
+    public void onBackPressed() {
+        if (!isExit) {
+            isExit = true;
+            showToast("再次点击退出应用");
+            new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                    isExit = false;
+                }
+            }.sendEmptyMessageDelayed(0, 3000);
+        } else {
+            super.onBackPressed();
+        }
+
+    }
 }

@@ -64,6 +64,19 @@ public class BaseActivity extends AutoLayoutActivity {
     }
 
     /**
+     * 通用提示对话框，带title
+     *
+     * @param title
+     * @param msg
+     */
+    protected void showAlert(String title, String msg, View.OnClickListener onClickListener) {
+        new XPopup.Builder(this)
+                .dismissOnTouchOutside(false) // 点击外部是否关闭弹窗，默认为true
+                .asCustom(new AlertPopupView(this).setTitle(title).setMsg(msg).setOnSubmitClickListener(onClickListener))
+                .show();
+    }
+
+    /**
      * 通用提示对话框，默认title
      *
      * @param msg

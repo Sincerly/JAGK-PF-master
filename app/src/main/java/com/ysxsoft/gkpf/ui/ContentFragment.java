@@ -406,8 +406,6 @@ public class ContentFragment extends Fragment {
             dfCell.setValue(0);
             currRowDfText.setText("0");
         }
-        //弹出提示
-        showToast("得分："+currRowDfText.getText().toString());
     }
 
     /**
