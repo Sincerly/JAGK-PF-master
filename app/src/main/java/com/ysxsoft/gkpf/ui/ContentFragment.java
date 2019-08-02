@@ -609,7 +609,7 @@ public class ContentFragment extends Fragment {
      */
     public void refreshMain(int currRow, Object object, boolean isConfirm) {
         //实时更新数据
-        int currIndex = currRow - xuHaoView.getRow() - 1;
+        int currIndex = peiFenViews.size();
         Iterator<Map.Entry<String, TextView>> iterator = noPfViews.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, TextView> entry = iterator.next();
