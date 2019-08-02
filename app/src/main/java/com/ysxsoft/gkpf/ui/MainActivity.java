@@ -104,6 +104,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     Map<String, List<CacheResponse>> cacheResponses;
     private String missionId = "";//TODO:考试ID
 
+    ContentFragmentAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,6 +116,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         MessageCallbackMap.reg("Main", this);
 //        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
+//        initList("");
         //initList("");
 //        initCache("");
     }
@@ -130,7 +133,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             taskList = new ArrayList<>();
         }
         taskList.clear();
-        //\json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"aaaaaa\",\"aaaaaa.xls\"]},{\"taskName\":\"taskName2\",\"taskState\":2,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]}]}";
+//        json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"aaaaaa\",\"aaaaaa.xls\"]},{\"taskName\":\"taskName2\",\"taskState\":2,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]}]}";
         try {
             JSONObject jsonObject = new JSONObject(json);
             String groupId = jsonObject.optString("groupId");

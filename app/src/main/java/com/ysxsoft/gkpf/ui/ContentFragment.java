@@ -621,7 +621,7 @@ public class ContentFragment extends Fragment {
         while (iterator.hasNext()) {
             Map.Entry<String, TextView> entry = iterator.next();
             MyCell pfCell = (MyCell) entry.getValue().getTag();
-            if (currRow > pfCell.getRow()&& (!pfCell.getValue().toString().equals("--"))) {
+            if (currRow > pfCell.getRow() && (!pfCell.getValue().toString().equals("--"))) {
                 currIndex++;
             }
         }
@@ -667,7 +667,39 @@ public class ContentFragment extends Fragment {
         if (cacheResponseList == null) {
             cacheResponseList = new ArrayList<>();
         }
-
+        List<CacheResponse> finalCacheResponseList = cacheResponseList;
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                if (finalCacheResponseList.size() > 0) {
+                    for (int i = xuHaoView.getRow(); i < huiZongView.getRow(); i++) {
+                        TextView tempTv = deFenViews.get("" + i);
+                        if (tempTv != null) {
+                            Iterator<Map.Entry<String, TextView>> iterator = deFenViews.entrySet().iterator();
+                            int currIndex = 0;
+                            while (iterator.hasNext()) {
+                                Map.Entry<String, TextView> entry = iterator.next();
+                                MyCell pfCell = (MyCell) entry.getValue().getTag();
+                                if (((MyCell) tempTv.getTag()).getRow() > pfCell.getRow() && (!pfCell.getValue().toString().equals("--"))) {
+                                    currIndex++;
+                                }
+                            }
+                            CacheResponse tempCache = finalCacheResponseList.get(currIndex);
+                            if (tempCache != null) {
+                                if (tempCache.isConfirmed()) {
+                                    getActivity().runOnUiThread(() -> {
+                                        MyCell tempCell = (MyCell) tempTv.getTag();
+                                        tempCell.setValue(tempCache.getScore());
+                                        tempTv.setText("" + tempCache.getScore().toString());
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }.start();
     }
 
 }
