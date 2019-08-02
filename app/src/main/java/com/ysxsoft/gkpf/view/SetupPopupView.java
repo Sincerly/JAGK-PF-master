@@ -7,11 +7,7 @@ import android.widget.EditText;
 
 import com.lxj.xpopup.core.AttachPopupView;
 import com.ysxsoft.gkpf.R;
-import com.ysxsoft.gkpf.api.MessageSender;
 import com.ysxsoft.gkpf.utils.ShareUtils;
-import com.ysxsoft.gkpf.utils.ToastUtils;
-
-import java.util.regex.Pattern;
 
 /**
  * 设置弹窗

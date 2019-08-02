@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +16,13 @@ import android.widget.TextView;
 import com.chong.widget.verticalviewpager.DummyViewPager;
 import com.chong.widget.verticalviewpager.VerticalVPOnTouchListener;
 import com.lxj.xpopup.XPopup;
-import com.lxj.xpopup.enums.PopupPosition;
 import com.ysxsoft.gkpf.R;
 import com.ysxsoft.gkpf.bean.MyCell;
 import com.ysxsoft.gkpf.bean.response.CacheResponse;
 import com.ysxsoft.gkpf.ui.adapter.LeftAdapter;
 import com.ysxsoft.gkpf.utils.JxlExcelReadUtils;
-import com.ysxsoft.gkpf.utils.PoiExcelReadUtils;
 import com.ysxsoft.gkpf.utils.ShareUtils;
 import com.ysxsoft.gkpf.utils.SystemUtils;
-import com.ysxsoft.gkpf.view.MainLeftPopupView;
 import com.ysxsoft.gkpf.view.PingFenPopupView;
 
 import java.util.ArrayList;
@@ -35,7 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.OnClick;
+import static android.text.TextUtils.isEmpty;
 
 public class ContentFragment extends Fragment {
 
@@ -300,7 +296,7 @@ public class ContentFragment extends Fragment {
                 }
                 MyCell tempDfCell = (MyCell) deFenViews.get("" + i).getTag();
                 //若评判结果既没有选择【正确】，也没有选择【错误】，则点击汇总后，该项自动选择为正确
-                if (TextUtils.isEmpty(tempDfCell.getValue().toString())) {
+                if (isEmpty(tempDfCell.getValue().toString())) {
                     DuiClick(peiFenViews.get("" + i));
                 }
                 Object tempDfValue = SystemUtils.getValueType(tempDfCell.getValue().toString());
@@ -351,25 +347,21 @@ public class ContentFragment extends Fragment {
         //评判结果是正数还是负数
         //负数，做对了，得0分，做错了，得负分
         if (tempValue < 0) {
+            //实时同步服务器缓存数据
+            refreshMain(myCell.getRow(), 0, !isEmpty(dfCell.getValue().toString()));
             dfCell.setValue(0);
             currRowDfText.setText("0");
-
         } else {
             if (tempValue == (int) tempValue) {
+                //实时同步服务器缓存数据
+                refreshMain(myCell.getRow(), (int) tempValue, !isEmpty(dfCell.getValue().toString()));
                 dfCell.setValue((int) tempValue);
                 currRowDfText.setText("" + ((int) tempValue));
             } else {
+                //实时同步服务器缓存数据
+                refreshMain(myCell.getRow(), tempValue, !isEmpty(dfCell.getValue().toString()));
                 dfCell.setValue(tempValue);
                 currRowDfText.setText("" + tempValue);
-            }
-        }
-        //实时更新数据
-        Iterator<Map.Entry<String, TextView>> iterator = noPfViews.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, TextView> entry = iterator.next();
-            MyCell noPFCell = (MyCell) noPfViews.get(entry.getKey()).getTag();
-            if (myCell.getRow() > noPFCell.getRow()) {
-
             }
         }
 
@@ -398,18 +390,22 @@ public class ContentFragment extends Fragment {
         //负数，做对了，得0分，做错了，得负分
         if (tempValue < 0) {
             if (tempValue == (int) tempValue) {
+                //实时同步服务器缓存数据
+                refreshMain(myCell.getRow(), (int) tempValue, !isEmpty(dfCell.getValue().toString()));
                 dfCell.setValue((int) tempValue);
                 currRowDfText.setText("" + ((int) tempValue));
             } else {
+                //实时同步服务器缓存数据
+                refreshMain(myCell.getRow(), tempValue, !isEmpty(dfCell.getValue().toString()));
                 dfCell.setValue(tempValue);
                 currRowDfText.setText("" + tempValue);
             }
         } else {
+            //实时同步服务器缓存数据
+            refreshMain(myCell.getRow(), 0, !isEmpty(dfCell.getValue().toString()));
             dfCell.setValue(0);
             currRowDfText.setText("0");
         }
-        //弹出提示
-        showToast("得分："+currRowDfText.getText().toString());
     }
 
     /**
@@ -517,7 +513,7 @@ public class ContentFragment extends Fragment {
      */
     private String pingfenJia(MyCell pfCell, MyCell dfCell, String value) {
         double tempValue = 0;
-        if (!TextUtils.isEmpty(dfCell.getValue().toString())) {
+        if (!isEmpty(dfCell.getValue().toString())) {
             tempValue = Double.valueOf(dfCell.getValue().toString());
         }
         tempValue += Double.valueOf(value);
@@ -534,9 +530,13 @@ public class ContentFragment extends Fragment {
         //弹出提示
         showToast("+" + value);
         if (tempValue == (int) tempValue) {
+            //实时同步服务器缓存数据
+            refreshMain(dfCell.getRow(), (int) tempValue, !isEmpty(dfCell.getValue().toString()));
             dfCell.setValue((int) tempValue);
             return ("" + ((int) tempValue));
         } else {
+            //实时同步服务器缓存数据
+            refreshMain(dfCell.getRow(), tempValue, !isEmpty(dfCell.getValue().toString()));
             dfCell.setValue(tempValue);
             return ("" + tempValue);
         }
@@ -553,7 +553,7 @@ public class ContentFragment extends Fragment {
      */
     private String pingfenJian(MyCell pfCell, MyCell dfCell, String value) {
         double tempValue = 0;
-        if (!TextUtils.isEmpty(dfCell.getValue().toString())) {
+        if (!isEmpty(dfCell.getValue().toString())) {
             tempValue = Double.valueOf(dfCell.getValue().toString());
         }
         tempValue -= Double.valueOf(value);
@@ -570,9 +570,13 @@ public class ContentFragment extends Fragment {
         //弹出提示
         showToast("-" + value);
         if (tempValue == (int) tempValue) {
+            //实时同步服务器缓存数据
+            refreshMain(dfCell.getRow(), (int) tempValue, !isEmpty(dfCell.getValue().toString()));
             dfCell.setValue((int) tempValue);
             return ("" + ((int) tempValue));
         } else {
+            //实时同步服务器缓存数据
+            refreshMain(dfCell.getRow(), tempValue, !isEmpty(dfCell.getValue().toString()));
             dfCell.setValue(tempValue);
             return ("" + tempValue);
         }
@@ -591,15 +595,32 @@ public class ContentFragment extends Fragment {
         }
     }
 
-    public void refreshMain(int p, Object object, boolean isConfirm) {
+    public void sendRefresh(MyCell myCell, boolean isConfirm) {
+
+    }
+
+    public void refreshMain(int currRow, Object object, boolean isConfirm) {
+        //实时更新数据
+        int currIndex = currRow - xuHaoView.getRow() - 1;
+        Iterator<Map.Entry<String, TextView>> iterator = noPfViews.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, TextView> entry = iterator.next();
+            MyCell noPFCell = (MyCell) noPfViews.get(entry.getKey()).getTag();
+            if (currRow > noPFCell.getRow()) {
+                currIndex--;
+            } else {
+                break;
+            }
+        }
+        //传给主页，更新服务器数据
         MainActivity activity = (MainActivity) getActivity();
-        activity.uploadByPosition(getFileName(), p, object, isConfirm);
+        activity.uploadByPosition(getFileName(), currIndex, object, isConfirm);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (getPosition() == 0 && (!TextUtils.isEmpty(ShareUtils.getInstruction()))) {
+        if (getPosition() == 0 && (!isEmpty(ShareUtils.getInstruction()))) {
             baseTips.setText(ShareUtils.getInstruction());
             baseTips.setVisibility(View.VISIBLE);
         }

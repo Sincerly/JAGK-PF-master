@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.lxj.xpopup.XPopup;
 import com.lxj.xpopup.core.DrawerPopupView;
 import com.ysxsoft.gkpf.R;
 import com.ysxsoft.gkpf.api.ApiManager;
@@ -45,8 +46,8 @@ public class MainLeftPopupView extends DrawerPopupView {
     protected void onCreate() {
         super.onCreate();
         //通过设置topMargin，可以让Drawer弹窗进行局部阴影展示
-        ViewGroup.MarginLayoutParams params = (MarginLayoutParams) getPopupContentView().getLayoutParams();
-        params.topMargin = SystemUtils.getStatusHeight((Activity) context);
+//        ViewGroup.MarginLayoutParams params = (MarginLayoutParams) getPopupContentView().getLayoutParams();
+//        params.topMargin = SystemUtils.getStatusHeight((Activity) context);
 
         TextView tv_type = findViewById(R.id.tv_type);
         String userType = ShareUtils.getUserType();
@@ -57,7 +58,11 @@ public class MainLeftPopupView extends DrawerPopupView {
         tv_name.setText(ShareUtils.getUserName());
         TextView tv_exit = findViewById(R.id.tv_exit);
         tv_exit.setOnClickListener(v -> {
-            ApiManager.logout();//退出登录
+            new XPopup.Builder(context)
+                    .asCustom(new AlertPopupView(context).setTitle("温馨提醒").setMsg("确定要退出登录吗？").setOnSubmitClickListener(v1 -> {
+                        ApiManager.logout();//退出登录
+                    }))
+                    .show();
         });
 
         RecyclerView recyclerView = findViewById(R.id.rv_activity_main_left_dialog);

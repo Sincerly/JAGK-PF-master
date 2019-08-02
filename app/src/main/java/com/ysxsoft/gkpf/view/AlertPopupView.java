@@ -12,6 +12,8 @@ import com.lxj.xpopup.core.CenterPopupView;
 import com.ysxsoft.gkpf.R;
 import com.ysxsoft.gkpf.utils.ShareUtils;
 
+import butterknife.OnClick;
+
 /**
  * 设置弹窗
  */
@@ -21,6 +23,7 @@ public class AlertPopupView extends CenterPopupView {
     private AlertPopupView instance;
     private String title;
     private String msg;
+    private OnClickListener onClickListener;
 
     public AlertPopupView(@NonNull Context context) {
         super(context);
@@ -43,6 +46,11 @@ public class AlertPopupView extends CenterPopupView {
         return this;
     }
 
+    public AlertPopupView setOnSubmitClickListener(OnClickListener onClickListener) {
+        this.onClickListener = onClickListener;
+        return this;
+    }
+
     @Override
     protected void onCreate() {
         super.onCreate();
@@ -55,11 +63,15 @@ public class AlertPopupView extends CenterPopupView {
             tvMsg.setText(msg);
         }
         //确认按钮
-        findViewById(R.id.tv_dialog_alert_btn).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                instance.dismiss();
-            }
-        });
+        if (onClickListener == null) {
+            findViewById(R.id.tv_dialog_alert_btn).setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    instance.dismiss();
+                }
+            });
+        } else {
+            findViewById(R.id.tv_dialog_alert_btn).setOnClickListener(onClickListener);
+        }
     }
 }

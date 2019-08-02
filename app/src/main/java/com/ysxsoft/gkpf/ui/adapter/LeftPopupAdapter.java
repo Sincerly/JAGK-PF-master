@@ -24,27 +24,30 @@ public class LeftPopupAdapter extends BaseQuickAdapter<TaskListResponse, BaseVie
         TextView tv_num = helper.getView(R.id.tv_activity_main_left_item_num);
         LinearLayout ll_bg = helper.getView(R.id.ll_activity_main_left_item_bg);
 
-        tv_num.setText(item.getFlowName());
+        if (item != null) {
+            tv_num.setText(item.getFlowName());
 
-        switch (item.getTaskState()) {
-            case 1:
-                tv_num.setTextColor(mContext.getColor(R.color.white));
-                ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_black);
-                break;
-            case 2:
-                tv_num.setTextColor(mContext.getColor(R.color.white));
-                ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_org);
-                break;
-            case 3:
-                tv_num.setTextColor(mContext.getColor(R.color.main_left_black));
-                ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_gray);
-                break;
-        }
 
-        int currPos = helper.getLayoutPosition();
-        if (currPos == currPage) {
-            tv_num.setTextColor(mContext.getColor(R.color.white));
-            ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_blue);
+            switch (item.getTaskState()) {
+                case 1:
+                    tv_num.setTextColor(mContext.getColor(R.color.white));
+                    ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_black);
+                    break;
+                case 2:
+                    tv_num.setTextColor(mContext.getColor(R.color.white));
+                    ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_org);
+                    break;
+                case 3:
+                    tv_num.setTextColor(mContext.getColor(R.color.main_left_black));
+                    ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_gray);
+                    break;
+            }
+
+            int currPos = helper.getLayoutPosition();
+            if (currPos == currPage) {
+                tv_num.setTextColor(mContext.getColor(R.color.white));
+                ll_bg.setBackgroundResource(R.drawable.activity_main_left_bg_blue);
+            }
         }
 
     }

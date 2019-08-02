@@ -23,15 +23,16 @@
         android:id="@+id/iv_activity_main_right_item_item_dui"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:src="@drawable/activity_main_button_right"
-        android:visibility="gone"/>
+        />
 
     <ImageView
         android:id="@+id/iv_activity_main_right_item_item_cuo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="18px"
-        android:src="@mipmap/activity_main_button_error"
+        android:src="@drawable/activity_main_button_error"
         android:visibility="gone"/>
 
     <ImageView
@@ -39,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="18px"
-        android:src="@mipmap/activity_main_button_cut"
+        android:src="@drawable/activity_main_button_cut"
         android:visibility="gone"/>
 
     <ImageView
@@ -47,7 +48,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="18px"
-        android:src="@mipmap/activity_main_button_add"
+        android:src="@drawable/activity_main_button_add"
         android:visibility="gone"/>
 
     <TextView

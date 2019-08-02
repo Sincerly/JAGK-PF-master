@@ -1,9 +1,11 @@
 package com.ysxsoft.gkpf.ui;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -86,7 +88,10 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     LinearLayout logLayout;
     @BindView(R.id.scrollView)
     NestedScrollView scrollView;
+    @BindView(R.id.tv_curr_page_name)
+    TextView tvCurrPageName;
 
+    private ContentFragmentAdapter fragmentAdapter;
     private LeftAdapter leftAdapter;
     private LeftPopupAdapter leftPopupAdapter;
     private LeftItemClickListener leftItemClick;
@@ -96,7 +101,6 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     private String missionId = "";//TODO:考试ID
 
     ContentFragmentAdapter adapter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,7 +111,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         MessageCallbackMap.reg("Main", this);
 //        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
-//        initList("");
+        initList("");
 //        initCache("");
     }
 
@@ -123,7 +127,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             taskList = new ArrayList<>();
         }
         taskList.clear();
-//        json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]},{\"taskName\":\"taskName2\",\"taskState\":2,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]}]}";
+        json = "{\"groupId\":\"1\",\"requestId\":1,\"missionId\":\"333\",\"taskInfoList\":[{\"taskName\":\"taskName1\",\"taskState\":1,\"flowNameList\":[\"aaaaaa\",\"aaaaaa.xls\"]},{\"taskName\":\"taskName2\",\"taskState\":2,\"flowNameList\":[\"Excel模板.xls\",\"Excel模板.xls\"]}]}";
         try {
             JSONObject jsonObject = new JSONObject(json);
             String groupId = jsonObject.optString("groupId");
@@ -158,8 +162,11 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         }
         //初始化ViewPager
         runOnUiThread(() -> {
-            initLeftData();
-            initViewPager();
+            //TODO 重复下发任务状态数据会崩溃，原因待查？
+            if (leftAdapter.getData().size() == 0) {
+                initViewPager();
+                initLeftData();
+            }
         });
         return missionId;
     }
@@ -405,6 +412,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     private void initLeftData() {
         if (taskList != null) {
             leftAdapter.setNewData(taskList);
+            leftPopupAdapter.setNewData(taskList);
         }
     }
 
@@ -415,8 +423,8 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         for (int i = 0; i < taskList.size(); i++) {
             holder.add(ContentFragment.newInstance(taskList.get(i).getFlowName(), i, verticalViewpager));
         }
-        adapter = holder.set();
-        verticalViewpager.setAdapter(adapter);
+        fragmentAdapter=holder.set();
+        verticalViewpager.setAdapter(fragmentAdapter);
         //If you setting other scroll mode, the scrolled fade is shown from either side of display.
         verticalViewpager.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
         verticalViewpager.setOffscreenPageLimit(taskList.size());
@@ -425,6 +433,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             public void onPageScrolled(int i, float v, int i1) {
                 leftAdapter.setCurrPage(i);
                 leftPopupAdapter.setCurrPage(i);
+                tvCurrPageName.setText(((ContentFragment)fragmentAdapter.getItem(i)).getFileName());
             }
 
             @Override
@@ -620,5 +629,24 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         return textView;
     }
 
+    private boolean isExit = false;
 
+    @SuppressLint("HandlerLeak")
+    @Override
+    public void onBackPressed() {
+        if (!isExit) {
+            isExit = true;
+            showToast("再次点击退出应用");
+            new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+                    isExit = false;
+                }
+            }.sendEmptyMessageDelayed(0, 3000);
+        } else {
+            super.onBackPressed();
+        }
+
+    }
 }
