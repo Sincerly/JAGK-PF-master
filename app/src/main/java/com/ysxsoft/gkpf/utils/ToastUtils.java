@@ -8,6 +8,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ysxsoft.gkpf.R;
+
 /**
  * Created by zhaozhipeng on 17/6/27.
  */
@@ -25,6 +27,7 @@ public class ToastUtils {
         layout.removeAllViews();
         layout.setOrientation(LinearLayout.HORIZONTAL);
         layout.setGravity(Gravity.CENTER_VERTICAL);
+        layout.setBackgroundResource(R.drawable.toast_bg);
         TextView tv = new TextView(context);
         tv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         tv.setGravity(Gravity.CENTER);

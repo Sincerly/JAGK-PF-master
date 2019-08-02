@@ -17,10 +17,10 @@
         android:roundIcon="@mipmap/activity_main_default_head"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+        >
         <activity
             android:name=".ui.LoginActivity"
-            android:launchMode="singleTask"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
