@@ -255,7 +255,7 @@ public class ContentFragment extends Fragment {
                                 tv_button.setOnClickListener(new HuiZongClickListener());
 
                                 //请求缓存
-                                int size = peiFenViews.size()-noPfViews.size();
+                                int size = peiFenViews.size() - noPfViews.size();
                                 requestCache(size);
                             }
                             baseView.addView(itemBase);
@@ -616,15 +616,13 @@ public class ContentFragment extends Fragment {
      */
     public void refreshMain(int currRow, Object object, boolean isConfirm) {
         //实时更新数据
-        int currIndex = peiFenViews.size();
-        Iterator<Map.Entry<String, TextView>> iterator = noPfViews.entrySet().iterator();
+        int currIndex = 0;
+        Iterator<Map.Entry<String, TextView>> iterator = peiFenViews.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, TextView> entry = iterator.next();
-            MyCell noPFCell = (MyCell) noPfViews.get(entry.getKey()).getTag();
-            if (currRow > noPFCell.getRow()) {
-                currIndex--;
-            } else {
-                break;
+            MyCell pfCell = (MyCell) entry.getValue().getTag();
+            if (currRow > pfCell.getRow()&& (!pfCell.getValue().toString().equals("--"))) {
+                currIndex++;
             }
         }
         //传给主页，更新服务器数据
@@ -657,8 +655,8 @@ public class ContentFragment extends Fragment {
     /**
      * 请求缓存
      */
-    public void requestCache(int size){
-        Logutils.e(getPosition()+"请求行数:"+size);
+    public void requestCache(int size) {
+        Logutils.e(getPosition() + "请求行数:" + size);
         MainActivity activity = (MainActivity) getActivity();
         activity.requestCache(getPosition(), getFileName(), size);
     }
@@ -666,9 +664,9 @@ public class ContentFragment extends Fragment {
     /**
      * 请求缓存返回
      */
-    public void responseCache(List<CacheResponse> cacheResponseList){
-        if(cacheResponseList==null){
-            cacheResponseList=new ArrayList<>();
+    public void responseCache(List<CacheResponse> cacheResponseList) {
+        if (cacheResponseList == null) {
+            cacheResponseList = new ArrayList<>();
         }
 
     }
