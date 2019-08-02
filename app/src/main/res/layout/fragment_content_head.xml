@@ -6,8 +6,9 @@
 
     <TextView
         android:id="@+id/tv_tips"
-        android:layout_width="match_parent"
+        android:layout_width="1772px"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:layout_marginBottom="20px"
         android:layout_marginTop="20px"
         android:lineSpacingExtra="10px"

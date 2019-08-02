@@ -262,7 +262,7 @@ public class ContentFragment extends Fragment {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            ((BaseActivity) getActivity()).showToast("文件解析异常");
+            showToast("文件解析异常");
         }
     }
 
@@ -279,11 +279,11 @@ public class ContentFragment extends Fragment {
         @Override
         public void onClick(View v) {
             if (pfZjTv == null) {
-                ((BaseActivity) getActivity()).showToast("配分总计项未找到");
+                showToast("配分总计项未找到");
                 return;
             }
             if (dfZjTv == null) {
-                ((BaseActivity) getActivity()).showToast("得分总计项未找到");
+                showToast("得分总计项未找到");
                 return;
             }
             MyCell pfZjCell = (MyCell) pfZjTv.getTag();
@@ -351,6 +351,7 @@ public class ContentFragment extends Fragment {
         if (tempValue < 0) {
             dfCell.setValue(0);
             currRowDfText.setText("0");
+
         } else {
             if (tempValue == (int) tempValue) {
                 dfCell.setValue((int) tempValue);
@@ -405,6 +406,8 @@ public class ContentFragment extends Fragment {
             dfCell.setValue(0);
             currRowDfText.setText("0");
         }
+        //弹出提示
+        showToast("得分："+currRowDfText.getText().toString());
     }
 
     /**
@@ -457,7 +460,7 @@ public class ContentFragment extends Fragment {
                             .show();
                 }
             } else {
-                ((BaseActivity) getActivity()).showToast("分数步进值为空");
+                showToast("分数步进值为空");
             }
         }
     }
@@ -526,6 +529,8 @@ public class ContentFragment extends Fragment {
                 tempValue = Double.valueOf(pfCell.getValue().toString());
             }
         }
+        //弹出提示
+        showToast("+" + value);
         if (tempValue == (int) tempValue) {
             dfCell.setValue((int) tempValue);
             return ("" + ((int) tempValue));
@@ -560,6 +565,8 @@ public class ContentFragment extends Fragment {
                 tempValue = 0;
             }
         }
+        //弹出提示
+        showToast("-" + value);
         if (tempValue == (int) tempValue) {
             dfCell.setValue((int) tempValue);
             return ("" + ((int) tempValue));
@@ -590,9 +597,14 @@ public class ContentFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (getPosition() == 0&& (!TextUtils.isEmpty(ShareUtils.getInstruction()))) {
+        if (getPosition() == 0 && (!TextUtils.isEmpty(ShareUtils.getInstruction()))) {
             baseTips.setText(ShareUtils.getInstruction());
             baseTips.setVisibility(View.VISIBLE);
         }
     }
+
+    public void showToast(String text) {
+        ((BaseActivity) getActivity()).showToast(text);
+    }
+
 }

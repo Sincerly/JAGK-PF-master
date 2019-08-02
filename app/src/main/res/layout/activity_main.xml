@@ -148,6 +148,7 @@
         android:layout_height="500px"
         android:layout_gravity="right|bottom"
         android:background="#000000"
+        android:visibility="gone"
         android:fillViewport="true">
 
         <LinearLayout

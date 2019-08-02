@@ -103,7 +103,7 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
         MessageCallbackMap.reg("Main", this);
 //        ApiManager.logout();//退出登录
         //ApiManager.cache();//请求缓存
-        initList("");
+//        initList("");
 //        initCache("");
     }
 
@@ -153,8 +153,10 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
             writeLog(e.getMessage(), 2);
         }
         //初始化ViewPager
-        initLeftData();
-        initViewPager();
+        runOnUiThread(() -> {
+            initLeftData();
+            initViewPager();
+        });
         return missionId;
     }
 
@@ -300,7 +302,9 @@ public class MainActivity extends BaseActivity implements IMessageCallback {
     }
 
     private void initLeftData() {
-        leftAdapter.setNewData(taskList);
+        if (taskList != null) {
+            leftAdapter.setNewData(taskList);
+        }
     }
 
     private void initViewPager() {
